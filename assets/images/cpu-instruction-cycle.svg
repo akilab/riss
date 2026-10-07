@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 660 220" role="img" aria-labelledby="title desc">
+  <title id="title">CPUの命令実行サイクル</title><desc id="desc">主記憶から命令を取り出す、制御装置が読み解く、命令を実行する。終わると次の命令を取り出す。</desc>
+  <rect width="660" height="220" rx="12" fill="#f5f8fc"/>
+  <g stroke="#172d45" stroke-width="2" fill="white"><rect x="20" y="40" width="170" height="100" rx="8"/><rect x="245" y="40" width="170" height="100" rx="8"/><rect x="470" y="40" width="170" height="100" rx="8"/></g>
+  <g fill="none" stroke="#172d45" stroke-width="3" stroke-linejoin="round"><path d="M190 90H240M228 80L240 90L228 100 M415 90H465M453 80L465 90L453 100 M555 140V180H105V145M95 155L105 145L115 155"/></g>
+  <g fill="#172d45" font-family="Meiryo, sans-serif" text-anchor="middle"><text x="105" y="83" font-size="24" font-weight="700">1. 取り出す</text><text x="105" y="115" font-size="18">命令をIRへ</text><text x="330" y="83" font-size="24" font-weight="700">2. 読み解く</text><text x="330" y="115" font-size="18">制御装置で解読</text><text x="555" y="83" font-size="24" font-weight="700">3. 実行する</text><text x="555" y="115" font-size="18">計算・読書きなど</text><text x="330" y="210" font-size="18">停止するまで、次の命令へ繰り返す</text></g>
+</svg>

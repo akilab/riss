@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="情報処理安全確保支援士 科目A-1の技術基礎を、操作しながら学ぶ静的Web教材。">
+  <title>科目A-1 技術基礎 | 支援士学習</title>
+  <script src="js/theme.js"></script>
+  <link rel="stylesheet" href="css/common.css">
+  <script src="js/curriculum.js" defer></script>
+  <script src="js/progress.js" defer></script>
+  <script src="js/common.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">本文へ移動</a>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="index.html">支援士学習<span>情報処理安全確保支援士 · 科目A-1</span></a>
+      <div class="header-actions"><a class="header-link" href="#curriculum">教材一覧</a><button type="button" class="button secondary theme-toggle" data-theme-toggle aria-label="ダークモード" aria-pressed="false" hidden>ダークモード：オフ</button></div>
+    </div>
+  </header>
+  <main id="main" class="container" tabindex="-1">
+    <p class="notice storage-notice" data-storage-notice role="status" hidden></p>
+    <p class="notice theme-notice" data-theme-notice role="status" hidden></p>
+    <noscript><p class="notice">JavaScriptが無効です。教材本文は読めますが、Lab・答え合わせ・進捗保存にはJavaScriptを有効にしてください。</p></noscript>
+    <section class="dashboard-intro" aria-labelledby="site-title">
+      <div>
+        <h1 id="site-title">科目A-1 技術基礎</h1>
+        <p class="lead">仕組みが分かると、問題の見え方が変わる。<br>数や通信の動きを、自分で変えて確かめる学習教材です。</p>
+        <p class="muted">ITの基礎から、ひとつずつ。まずは8個のbitで数を作ってみましょう。</p>
+        <a class="button" href="lessons/01-number-bit.html" data-resume>Lesson 01から学習を始める</a>
+      </div>
+      <section class="progress-panel" aria-labelledby="progress-title">
+        <h2 id="progress-title">あなたの学習進捗</h2>
+        <p class="progress-count"><b class="number" data-progress-count>0</b> <span>/ 5ページ完了</span></p>
+        <progress data-progress-bar max="5" value="0" aria-label="公開済み5ページ中0ページ完了">0 / 5</progress>
+        <p class="small muted">公開済み：5ページ · 全体計画：29ページ</p>
+        <p class="small muted">進捗は、このブラウザに保存されます。</p>
+      </section>
+    </section>
+    <section id="curriculum" aria-labelledby="curriculum-title">
+      <div class="section-heading"><h2 id="curriculum-title">学習するテーマ</h2><span class="small muted">10章 · 基礎からセキュリティへ</span></div>
+      <div class="chapter-grid">
+        <section class="chapter-card" aria-labelledby="chapter-01">
+          <h3 id="chapter-01"><span class="chapter-number">01</span>数値と論理</h3>
+          <p class="chapter-description">0と1から、数の表現とコンピュータの判断の仕組みを学びます。</p>
+          <p class="chapter-summary" data-chapter-summary="01">3ページ予定 · 公開 3 · 完了 0</p>
+          <ul class="lesson-list">
+            <li><a href="lessons/01-number-bit.html"><span class="lesson-number">01</span>進数・bit</a><span class="status" data-lesson-status="01">未学習</span></li>
+            <li><a href="lessons/02-logic.html"><span class="lesson-number">02</span>論理演算</a><span class="status" data-lesson-status="02">未学習</span></li>
+            <li><a href="lessons/03-flipflop.html"><span class="lesson-number">03</span>論理回路・フリップフロップ</a><span class="status" data-lesson-status="03">未学習</span></li>
+          </ul>
+        </section>
+        <section class="chapter-card" aria-labelledby="chapter-02">
+          <h3 id="chapter-02"><span class="chapter-number">02</span>コンピュータ</h3>
+          <p class="chapter-description">命令を実行するCPUと、データを支えるメモリの役割を学びます。</p>
+          <p class="chapter-summary" data-chapter-summary="02">3ページ予定 · 公開 2 · 完了 0</p>
+          <ul class="lesson-list">
+            <li><a href="lessons/04-cpu.html"><span class="lesson-number">04</span>CPU・命令実行</a><span class="status" data-lesson-status="04">未学習</span></li>
+            <li><a href="lessons/05-memory-cache.html"><span class="lesson-number">05</span>メモリ・キャッシュ</a><span class="status" data-lesson-status="05">未学習</span></li>
+            <li><span><span class="lesson-number">06</span>入出力・割込み</span><span class="status" data-state="planned">準備中</span></li>
+          </ul>
+        </section>
+        <section class="chapter-card" aria-labelledby="chapter-03">
+          <h3 id="chapter-03"><span class="chapter-number">03</span>OS</h3>
+          <p class="chapter-description">複数の処理と限られた資源を、OSがどう管理するかを学びます。</p>
+          <p class="chapter-summary" data-chapter-summary="03">3ページ予定 · 公開 0 · 完了 0</p>
+          <ul class="lesson-list">
+            <li><span><span class="lesson-number">07</span>プロセス・スレッド</span><span class="status" data-state="planned">準備中</span></li>
+            <li><span><span class="lesson-number">08</span>スケジューリング</span><span class="status" data-state="planned">準備中</span></li>
+            <li><span><span class="lesson-number">09</span>仮想記憶</span><span class="status" data-state="planned">準備中</span></li>
+          </ul>
+        </section>
+        <section class="chapter-card" aria-labelledby="chapter-04">
+          <h3 id="chapter-04"><span class="chapter-number">04</span>ネットワーク</h3>
+          <p class="chapter-description">Webサイトへアクセスするまでの、通信全体の流れを学びます。</p>
+          <p class="chapter-summary" data-chapter-summary="04">6ページ予定 · 公開 0 · 完了 0</p>
+          <ul class="lesson-list">
+            <li><span><span class="lesson-number">10</span>LAN・MAC・ARP</span><span class="status" data-state="planned">準備中</span></li>
+            <li><span><span class="lesson-number">11</span>IPアドレス</span><span class="status" data-state="planned">準備中</span></li>
+            <li><span><span class="lesson-number">12</span>サブネット</span><span class="status" data-state="planned">準備中</span></li>
+            <li><span><span class="lesson-number">13</span>ルーティング</span><span class="status" data-state="planned">準備中</span></li>
+            <li><span><span class="lesson-number">14</span>TCP・UDP</span><span class="status" data-state="planned">準備中</span></li>
+            <li><span><span class="lesson-number">15</span>DNS・DHCP・Webアクセス</span><span class="status" data-state="planned">準備中</span></li>
+          </ul>
+        </section>
+        <section class="chapter-card" aria-labelledby="chapter-05">
+          <h3 id="chapter-05"><span class="chapter-number">05</span>データベース</h3>
+          <p class="chapter-description">データの整理と、矛盾なく更新するための仕組みを学びます。</p>
+          <p class="chapter-summary" data-chapter-summary="05">3ページ予定 · 公開 0 · 完了 0</p>
+          <ul class="lesson-list">
+            <li><span><span class="lesson-number">16</span>DB基礎・キー</span><span class="status" data-state="planned">準備中</span></li>
+            <li><span><span class="lesson-number">17</span>正規化</span><span class="status" data-state="planned">準備中</span></li>
+            <li><span><span class="lesson-number">18</span>トランザクション</span><span class="status" data-state="planned">準備中</span></li>
+          </ul>
+        </section>
+        <section class="chapter-card" aria-labelledby="chapter-06">
+          <h3 id="chapter-06"><span class="chapter-number">06</span>アルゴリズム</h3>
+          <p class="chapter-description">データの持ち方と、効率よく探す・並べる手順を学びます。</p>
+          <p class="chapter-summary" data-chapter-summary="06">2ページ予定 · 公開 0 · 完了 0</p>
+          <ul class="lesson-list">
+            <li><span><span class="lesson-number">19</span>データ構造</span><span class="status" data-state="planned">準備中</span></li>
+            <li><span><span class="lesson-number">20</span>探索・ソート</span><span class="status" data-state="planned">準備中</span></li>
+          </ul>
+        </section>
+        <section class="chapter-card" aria-labelledby="chapter-07">
+          <h3 id="chapter-07"><span class="chapter-number">07</span>システム</h3>
+          <p class="chapter-description">処理の速さと、システムが動き続ける確かさを数で考えます。</p>
+          <p class="chapter-summary" data-chapter-summary="07">2ページ予定 · 公開 0 · 完了 0</p>
+          <ul class="lesson-list">
+            <li><span><span class="lesson-number">21</span>性能</span><span class="status" data-state="planned">準備中</span></li>
+            <li><span><span class="lesson-number">22</span>信頼性</span><span class="status" data-state="planned">準備中</span></li>
+          </ul>
+        </section>
+        <section class="chapter-card" aria-labelledby="chapter-08">
+          <h3 id="chapter-08"><span class="chapter-number">08</span>暗号</h3>
+          <p class="chapter-description">AliceとBobのやり取りから、秘密と信頼を守る仕組みを学びます。</p>
+          <p class="chapter-summary" data-chapter-summary="08">4ページ予定 · 公開 0 · 完了 0</p>
+          <ul class="lesson-list">
+            <li><span><span class="lesson-number">23</span>ハッシュ・MAC</span><span class="status" data-state="planned">準備中</span></li>
+            <li><span><span class="lesson-number">24</span>共通鍵暗号</span><span class="status" data-state="planned">準備中</span></li>
+            <li><span><span class="lesson-number">25</span>公開鍵暗号</span><span class="status" data-state="planned">準備中</span></li>
+            <li><span><span class="lesson-number">26</span>電子署名・PKI・TLS</span><span class="status" data-state="planned">準備中</span></li>
+          </ul>
+        </section>
+        <section class="chapter-card" aria-labelledby="chapter-09">
+          <h3 id="chapter-09"><span class="chapter-number">09</span>Web・セキュリティ</h3>
+          <p class="chapter-description">Webの仕組みを土台に、入力が問題を起こす理由を学びます。</p>
+          <p class="chapter-summary" data-chapter-summary="09">2ページ予定 · 公開 0 · 完了 0</p>
+          <ul class="lesson-list">
+            <li><span><span class="lesson-number">27</span>HTTP・Cookie・Session</span><span class="status" data-state="planned">準備中</span></li>
+            <li><span><span class="lesson-number">28</span>Web攻撃</span><span class="status" data-state="planned">準備中</span></li>
+          </ul>
+        </section>
+        <section class="chapter-card" aria-labelledby="chapter-10">
+          <h3 id="chapter-10"><span class="chapter-number">10</span>総合</h3>
+          <p class="chapter-description">身に付けた仕組みの理解を、科目A-1形式の問題につなげます。</p>
+          <p class="chapter-summary" data-chapter-summary="10">1ページ予定 · 公開 0 · 完了 0</p>
+          <ul class="lesson-list"><li><span><span class="lesson-number">29</span>A-1総合演習</span><span class="status" data-state="planned">準備中</span></li></ul>
+        </section>
+      </div>
+    </section>
+    <section class="guide" aria-labelledby="guide-title">
+      <h2 id="guide-title">この教材の使い方</h2>
+      <ol class="learning-flow"><li>予想する</li><li>動かす</li><li>結果を見る</li><li>理由を読む</li><li>問題を解く</li></ol>
+      <p>正解を急ぐよりも、「なぜそうなるのか」を確かめてください。各教材は10〜20分が目安です。</p>
+      <p class="small muted">完了は教材末尾のボタンで記録します。確認問題の成績とは別に管理します。進捗は端末・ブラウザ間で同期されず、ブラウザの保存データを消すと記録も消えます。</p>
+    </section>
+  </main>
+  <footer class="site-footer"><div class="container"><p>支援士学習 · 科目A-1 技術基礎</p><p>仕組みを理解して、セキュリティの学習へ。</p></div></footer>
+</body>
+</html>

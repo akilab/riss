@@ -1,0 +1,59 @@
+body[data-lesson-id="04"] #lab { padding-top: 12px; }
+[data-cpu-lab] { padding: 16px; margin-block: 12px; }
+[data-cpu-lab] h3 { margin-bottom: 8px; font-size: 20px; }
+[data-cpu-lab] .prediction { padding: 8px 12px; margin-block: 8px; }
+.cpu-phases { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; padding: 0; list-style: none; margin-block: 8px; }
+.cpu-phases li { padding: 8px 10px; border: 1px solid var(--color-border); border-radius: 6px; margin: 0; font-size: 15px; min-height: 44px; }
+.cpu-phases li[aria-current="step"] { border-color: var(--color-primary); background: var(--color-tint); font-weight: 700; }
+.cpu-phases li[aria-current="step"]::after { content: "（直前）"; font-size: 13px; }
+.cpu-layout { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); gap: 16px; align-items: start; }
+.cpu-svg { display: block; width: 100%; max-width: 520px; height: auto; margin: 0 auto 12px; border: 1px solid var(--color-border); border-radius: 8px; background: var(--color-bg); }
+.cpu-svg text { fill: var(--color-text); font: 20px var(--font-body); }
+.cpu-svg .cpu-value { font: 700 25px var(--font-number); }
+.cpu-svg .cpu-instruction { font: 700 20px var(--font-number); }
+.cpu-svg .cpu-detail { font-size: 17px; }
+.cpu-box { fill: var(--color-surface); stroke: var(--color-input-border); stroke-width: 1.5; }
+.cpu-frame { fill: none; stroke: var(--color-border); stroke-width: 1.5; }
+.cpu-active { fill: var(--color-tint); stroke: var(--color-primary); stroke-width: 3; }
+.cpu-arrow { fill: none; stroke: var(--color-muted); stroke-width: 2; }
+.cpu-current-row td { background: var(--color-tint); }
+.cpu-memory { margin: 0 0 10px; font-size: 14px; line-height: 1.45; }
+.cpu-memory caption { margin-bottom: 6px; }
+.cpu-memory th[scope="row"] { white-space: nowrap; }
+.cpu-memory th, .cpu-memory td { padding: 6px 8px; }
+.cpu-feedback { display: grid; grid-template-columns: 180px minmax(0, 1fr); gap: 20px; padding: 12px 16px; margin-block: 8px; min-height: 124px; }
+.cpu-feedback p { margin: 0; }
+.cpu-feedback [data-cpu-result] { font-size: 14px; margin-bottom: 6px; color: var(--color-muted); }
+.cpu-feedback .cpu-values { display: grid; gap: 8px; margin: 0; }
+.cpu-feedback .cpu-values > div { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.cpu-feedback .cpu-values dd { font-size: 22px; line-height: 1.4; }
+[data-cpu-lab] > .lab-controls { margin-block: 8px; }
+.cpu-options, .cpu-model-notes { margin-block: 8px; }
+.cpu-options > summary { line-height: 1.5; }
+.cpu-options summary, .cpu-model-notes summary { cursor: pointer; color: var(--color-primary); font-weight: 700; }
+.cpu-options summary:hover, .cpu-model-notes summary:hover { color: var(--color-primary-hover); }
+.cpu-values { display: flex; flex-wrap: wrap; gap: 16px 32px; margin: 0 0 16px; }
+.cpu-values dt { font-size: 14px; color: var(--color-muted); }
+.cpu-values dd { margin: 0; font-size: 24px; font-weight: 700; font-family: var(--font-number); }
+.cpu-form { border-top: 1px solid var(--color-border); padding-top: 20px; }
+.cpu-form .lab-controls > div { flex: 1; min-width: 110px; }
+.cpu-form input { width: 100%; }
+@media (max-width: 760px) {
+  .cpu-layout { grid-template-columns: 1fr; }
+  .cpu-svg { max-width: 440px; }
+  .cpu-feedback { grid-template-columns: 1fr; gap: 12px; }
+  .cpu-feedback .cpu-values { display: flex; }
+}
+@media (max-width: 520px) {
+  .cpu-phases { grid-template-columns: 1fr; }
+  .cpu-phases li { min-height: 0; }
+  .cpu-svg text { font-size: 26px; }
+  .cpu-svg .cpu-value { font-size: 32px; }
+  .cpu-svg .cpu-instruction { font-size: 23px; }
+  .cpu-svg .cpu-detail { font-size: 23px; }
+  .cpu-memory th, .cpu-memory td { padding: 8px 4px; }
+  [data-cpu-next] { width: 100%; }
+}
+@media (forced-colors: active) {
+  .cpu-active { stroke: Highlight; }
+}

@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 260" role="img" aria-labelledby="title desc">
+  <title id="title">Dフリップフロップの値の保持</title><desc id="desc">入力Dが変わっても出力Qは保持され、Clockが0から1になる瞬間にDを取り込みます。</desc>
+  <rect width="680" height="260" rx="12" fill="#f5f8fc"/>
+  <g fill="none" stroke="#172d45" stroke-width="3" stroke-linejoin="round"><path d="M110 95H260M410 95H560M110 165H260"/><rect x="260" y="45" width="150" height="160" rx="8"/><path d="M260 150L279 165L260 180"/></g>
+  <g fill="#172d45" font-family="Meiryo, sans-serif" font-size="20"><text x="45" y="101">入力D</text><text x="275" y="103">D</text><text x="374" y="103">Q</text><text x="570" y="101">出力Q</text><text x="25" y="171">Clock</text><text x="335" y="136" text-anchor="middle" font-weight="700">1bitを保持</text><text x="340" y="239" text-anchor="middle">Clockの0 → 1で、その瞬間のDを取り込む</text></g>
+</svg>

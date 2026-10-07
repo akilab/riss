@@ -1,0 +1,18 @@
+.sr-diagram-scroll { overflow-x: auto; padding: 4px; margin-block: 20px; scrollbar-gutter: stable; }
+.sr-diagram-scroll figure { margin: 0; }
+.sr-svg, .sr-reference { display: block; width: 100%; min-width: 600px; height: auto; }
+.sr-svg { background: var(--color-bg); border: 1px solid var(--color-border); border-radius: 8px; }
+.sr-svg text { fill: var(--color-text); font: 22px var(--font-body); }
+.sr-svg .sr-number { font: 700 24px var(--font-number); }
+.sr-junction { fill: var(--color-text); }
+.sr-svg .signal-wire[data-signal="?"] { stroke-dasharray: 2 7; }
+.sr-controls .button { flex: 1; min-width: 210px; }
+.sr-calculations { padding-left: 24px; }
+.sr-calculations li { margin-block: 12px; }
+.sr-forbidden { margin-block: 24px; }
+.sr-forbidden summary { cursor: pointer; font-weight: 700; }
+.sr-forbidden summary:hover { color: var(--color-primary); }
+.sr-forbidden summary:active { color: var(--color-primary-hover); }
+@media (max-width: 520px) {
+  .sr-controls .button { min-width: 0; flex-basis: 100%; }
+}

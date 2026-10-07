@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="主記憶とキャッシュの違いを、コピーの読出しを操作して学ぶ初学者向け教材。">
+  <title>Lesson 05 メモリ・キャッシュ | 科目A-1 技術基礎</title>
+  <script src="../js/theme.js"></script>
+  <link rel="stylesheet" href="../css/common.css">
+  <link rel="stylesheet" href="../css/lesson.css">
+  <link rel="stylesheet" href="../css/lab.css">
+  <link rel="stylesheet" href="../css/memory-cache.css">
+  <script src="../js/curriculum.js" defer></script>
+  <script src="../js/progress.js" defer></script>
+  <script src="../js/common.js" defer></script>
+  <script src="../js/quiz.js" defer></script>
+  <script src="../js/labs/memory-cache.js" defer></script>
+</head>
+<body data-lesson-id="05">
+  <a class="skip-link" href="#main">本文へ移動</a>
+  <header class="site-header"><div class="container header-inner"><a class="brand" href="../index.html">支援士学習<span>情報処理安全確保支援士 · 科目A-1</span></a><div class="header-actions"><a class="header-link" href="../index.html#curriculum">教材一覧</a><button type="button" class="button secondary theme-toggle" data-theme-toggle aria-label="ダークモード" aria-pressed="false" hidden>ダークモード：オフ</button></div></div></header>
+  <main id="main" class="container" tabindex="-1">
+    <p class="notice storage-notice" data-storage-notice role="status" hidden></p>
+    <p class="notice theme-notice" data-theme-notice role="status" hidden></p>
+    <noscript><p class="notice">JavaScriptが無効です。本文と例は読めますが、Lab・答え合わせ・進捗保存にはJavaScriptを有効にしてください。</p></noscript>
+    <nav class="breadcrumb" aria-label="パンくず"><a href="../index.html">全体目次</a> / <a href="../index.html#chapter-02">コンピュータ</a> / <span aria-current="page">メモリ・キャッシュ</span></nav>
+    <header class="lesson-heading">
+      <span class="status" data-lesson-status="05">未学習</span>
+      <h1>Lesson 05　メモリ・キャッシュ</h1>
+      <p>必要な数を、毎回遠くまで読みに行くのでしょうか。手近なコピーを使う仕組みを確かめます。</p>
+      <div class="lesson-meta"><span>学習時間：10〜20分</span><span>前提知識：Lesson 04の「番地と数」</span><span>範囲：主記憶・キャッシュ・ヒットとミス</span></div>
+    </header>
+    <div class="lesson-layout">
+      <nav class="lesson-toc" aria-label="ページ内目次">
+        <h2>このページの内容</h2>
+        <ol><li><a href="#image">まずイメージを掴む</a></li><li><a href="#mechanism">仕組みを理解する</a></li><li><a href="#lab">触ってみる</a></li><li><a href="#exam">試験ではこう問われる</a></li><li><a href="#quiz">確認問題</a></li><li><a href="#complete">学習を振り返る</a></li></ol>
+      </nav>
+      <article class="lesson-body" aria-label="メモリ・キャッシュの教材">
+<section class="objectives" aria-labelledby="objectives-title">
+<h2 id="objectives-title">このページで学ぶこと</h2><ul><li>主記憶・キャッシュ・SSDの役割の違いを説明できる。</li><li>「場所の番号」と「その場所にある数」を区別できる。</li><li>キャッシュのヒット・ミスと、コピーの入替えを操作で確かめられる。</li><li>ヒット率と、平均の待ち時間を求められる。</li></ul>
+</section>
+<section id="image" class="lesson-section" aria-labelledby="image-title">
+<h2 id="image-title"><span class="section-number">1.</span>まずイメージを掴む</h2>
+<figure class="hardware-overview">
+<img class="hardware-illustration" src="../assets/images/hardware-memory-components.png" width="1536" height="1024" alt="CPUの実物に近い絵と、その内部にあるレジスタ・キャッシュの拡大イメージ。隣に、細長い基板の主記憶（メモリ）とM.2型SSDを示す。レジスタとキャッシュはCPU内、メモリとSSDは別の部品。">
+<figcaption>
+<p class="small muted">デスクトップPCの部品の見た目と役割を結び付けるイラストです。レジスタとキャッシュはCPU内部の拡大イメージです。色分けと点線は説明用で、実際の内部配置・大きさ・配線を再現したものではありません。</p>
+<dl class="hardware-roles">
+<div><dt>① レジスタ · CPU内部</dt><dd>今の計算に使う数などを保持する。</dd></div>
+<div><dt>② キャッシュ · CPU内部</dt><dd>主記憶のデータの一部をコピーして、すばやく読む。</dd></div>
+<div><dt>③ 主記憶（メモリ）</dt><dd>実行中のプログラムの命令やデータを置く。</dd></div>
+<div><dt>④ SSD</dt><dd>ファイルやプログラムを保存する。電源を切っても残る。</dd></div>
+</dl>
+</figcaption>
+</figure>
+<p>本棚にある資料を何度も使うなら、必要な部分をコピーして机に置くと便利です。本棚へ取りに行く回数が減ります。ただし、机には全部の資料を置けません。</p>
+<div class="example"><h3>主記憶は本棚、キャッシュは手近なコピー置き場</h3><p><strong>主記憶（メインメモリ）：</strong>CPUが使う命令やデータを置く場所です。Lesson 04で見た、番号の付いた箱の集まりです。</p><p><strong>キャッシュメモリ：</strong>主記憶の一部のデータをコピーして置く、小さくて高速な記憶場所です。CPUが必要なデータを早く読めるようにします。</p><p>コピーを作っても、<strong>主記憶にある元のデータは残ります</strong>。図書館から本を借りて元の棚が空になる、という動きとは違います。</p></div>
+<p>ここでは数をデータとして使います。プログラムを書ける必要はありません。「どの箱の中身を読むか」を選ぶだけで試せます。</p>
+</section>
+<section id="mechanism" class="lesson-section" aria-labelledby="mechanism-title">
+<h2 id="mechanism-title"><span class="section-number">2.</span>仕組みを理解する</h2>
+<h3>場所の番号と、中身の数を分けよう</h3>
+<p><strong>場所：10番地。中身：数12。</strong>これは「10番の箱に12が入っている」という意味です。CPUが10番地を読むと、受け取る数は10ではなく12です。</p>
+<p>キャッシュには「数12」だけでなく、<strong>どの場所のコピーか</strong>も分かるように置きます。CPUが10番地を読みたいとき、キャッシュに「10番地のコピー」があるか探すためです。</p>
+<h3>コピーがあればヒット、なければミス</h3>
+<ol><li>CPUが「10番地の中身を読みたい」と要求する。</li><li>キャッシュに10番地のコピーがあるか確認する。</li><li><strong>あればヒット：</strong>キャッシュから中身の数を読む。</li><li><strong>なければミス：</strong>主記憶から数を読み、次回に備えてキャッシュにもコピーを置く。</li></ol>
+<p class="notice">ヒット・ミスは、コピーが<strong>見つかったかどうか</strong>です。ミスは計算の間違いや故障ではありません。空のキャッシュで初めて読むと、ミスになります。</p>
+<h3>なぜコピーを全部置かないの？</h3>
+<p>キャッシュは速い反面、容量が小さく、同じ容量を作るための費用も高くなります。全部を置く代わりに、繰り返し使いそうなデータを残します。<strong>同じ場所を何度も読む</strong>ことが、効果を理解する最初の手掛かりです。</p>
+<p>満杯で新しいコピーを置くときは、どれかを入れ替えます。このLabでは<strong>最後に読んでから、最も長く使っていないコピー</strong>を選びます。取り除くのはキャッシュのコピーだけで、主記憶の元の数は消しません。</p>
+<h3>「メモリ」と「保存用のSSD」は役割が違う</h3>
+<table class="reference-table"><caption>記憶場所の役割を比べる</caption><thead><tr><th scope="col">場所</th><th scope="col">役割</th><th scope="col">通常、電源を切ると</th></tr></thead><tbody><tr><th scope="row">レジスタ</th><td>CPU内で計算中の数などを保持</td><td>内容は失われる</td></tr><tr><th scope="row">キャッシュ</th><td>CPU内やその近くに、一部のデータのコピーを保持</td><td>内容は失われる</td></tr><tr><th scope="row">主記憶</th><td>実行中のプログラムの命令やデータを保持</td><td>内容は失われる</td></tr><tr><th scope="row">SSD・HDD</th><td>ファイルやプログラムを長期に保存</td><td>内容が残る</td></tr></tbody></table>
+<p>電源を切ると内容が失われる性質を<strong>揮発性</strong>と呼びます。作業中の内容を残したいときは、SSDなどへ保存する必要があります。CPUのキャッシュは、ファイルを長期保存する場所ではありません。</p>
+<figure class="example"><img class="reference-image" src="../assets/images/memory-hierarchy.svg" width="680" height="330" alt="レジスタはCPUの計算中の値、キャッシュは一部のコピー、主記憶は実行中の命令やデータ、SSDやHDDは長期保存。一般にこの順で容量は大きく、CPUが読む時間は長くなる。"><figcaption class="small muted">記憶階層の概略。速度や容量は製品によって異なります。</figcaption></figure>
+<details><summary>試験用語：DRAM・SRAM・L1／L2／L3</summary><p>主記憶には一般に<strong>DRAM</strong>、CPUのキャッシュには一般に<strong>SRAM</strong>が使われます。どちらも揮発性です。</p><ul><li><strong>DRAM：</strong>内容を保つため、定期的にデータを維持する処理（リフレッシュ）が必要です。大容量の主記憶に向きます。</li><li><strong>SRAM：</strong>通電中はリフレッシュなしで保持できます。高速ですが、同じ容量なら高価になるため、少量のキャッシュに向きます。</li></ul><p>キャッシュを何段かに分ける場合、L1・L2・L3という名前を使います。一般にL1はCPUの処理部分に近く小さくて速く、L2・L3はより大きなコピー置き場です。このLabでは1段だけを扱います。</p></details>
+</section>
+<section id="lab" class="lesson-section" aria-labelledby="lab-title">
+<h2 id="lab-title"><span class="section-number">3.</span>触ってみる</h2>
+<noscript><p class="notice">JavaScriptを有効にするとLabを操作できます。空のキャッシュで10番地を初めて読むとミス、同じ場所をもう一度読むとヒットになる例は本文でも読めます。</p></noscript>
+<div class="lab" data-cache-lab hidden>
+<h3>同じ場所を2回読んで比べよう</h3>
+<p class="prediction"><strong>予想：</strong>「10番地の数を読む」を2回押すと、2回目の待ち時間はどうなるでしょうか？</p>
+<div class="cache-controls" role="group" aria-label="読む箱の場所を選ぶ"><button type="button" class="button secondary" data-cache-read="10">10番地の数を読む</button><button type="button" class="button secondary" data-cache-read="11">11番地の数を読む</button><button type="button" class="button secondary" data-cache-read="12">12番地の数を読む</button></div>
+<div class="cache-layout"><svg class="cache-svg" viewBox="0 0 360 335" role="img" aria-labelledby="cache-svg-title cache-svg-desc">
+<title id="cache-svg-title">CPU・キャッシュ・主記憶の読出し経路</title><desc id="cache-svg-desc" data-cache-desc>キャッシュは空です。まずコピーを確認し、なければ主記憶から数を読みます。</desc>
+<rect class="cache-box" x="20" y="10" width="320" height="60" rx="6"/><text x="180" y="34" text-anchor="middle">CPU（数を読む側）</text><text class="cache-small cache-number" data-cache-cpu-number x="180" y="59" text-anchor="middle">まだ数を読んでいません</text>
+<path class="cache-route" data-cache-route="cache" d="M180 70V94 M173 84L180 94L187 84"/><text class="cache-small" x="202" y="89">①コピーを確認</text>
+<rect class="cache-box" x="20" y="98" width="320" height="105" rx="6"/><text x="180" y="121" text-anchor="middle">キャッシュ（コピー2個まで）</text>
+<rect class="cache-box" x="30" y="129" width="140" height="65" rx="4"/><text class="cache-small" data-cache-slot="0" x="100" y="150" text-anchor="middle">空き</text><text class="cache-small cache-number" data-cache-slot-value="0" x="100" y="180" text-anchor="middle">コピーなし</text>
+<rect class="cache-box" x="190" y="129" width="140" height="65" rx="4"/><text class="cache-small" data-cache-slot="1" x="260" y="150" text-anchor="middle">空き</text><text class="cache-small cache-number" data-cache-slot-value="1" x="260" y="180" text-anchor="middle">コピーなし</text>
+<path class="cache-route" data-cache-route="memory" d="M180 203V229 M173 219L180 229L187 219"/><text class="cache-small" x="202" y="223">②なければ読む</text>
+<rect class="cache-box" x="20" y="233" width="320" height="67" rx="6"/><text x="180" y="258" text-anchor="middle">主記憶（元の数がある場所）</text><text class="cache-small" x="180" y="287" text-anchor="middle">コピーしても、元の数は残ります</text>
+<text class="cache-small" x="180" y="325" text-anchor="middle">矢印＝探す順番、太線＝直前の経路</text></svg><div><table class="reference-table cache-table"><caption>主記憶：番号の付いた3つの箱</caption><thead><tr><th scope="col">場所</th><th scope="col">中身の数</th></tr></thead><tbody><tr><th scope="row">10番地</th><td>12</td></tr><tr><th scope="row">11番地</th><td>7</td></tr><tr><th scope="row">12番地</th><td>19</td></tr></tbody></table>
+<table class="reference-table cache-table"><caption>キャッシュ：どの場所のコピー？</caption><thead><tr><th scope="col">コピー元の場所</th><th scope="col">コピーした数</th></tr></thead><tbody><tr data-cache-table-slot="0"><td data-cache-place>空き</td><td data-cache-number>—</td></tr><tr data-cache-table-slot="1"><td data-cache-place>空き</td><td data-cache-number>—</td></tr></tbody></table></div></div>
+<div class="lab-result cache-feedback"><p data-cache-result></p><p data-cache-reason></p><p data-cache-time></p><p class="cache-stat-line" data-cache-counts></p><p class="cache-stat-line" data-cache-total></p></div>
+<p class="sr-only" data-cache-status role="status" aria-atomic="true"></p>
+<button type="button" class="button secondary" data-cache-reset>コピーと計測を最初に戻す</button>
+</div>
+<p class="small muted">待ち時間は実験用の目盛りです。キャッシュの確認・読出しは1単位、ミス時は主記憶からの読出し・コピーに9単位を追加（合計10単位）。キャッシュなしなら毎回9単位。実機の速度を測っているわけではありません。</p>
+<details class="cache-notes"><summary>おすすめの操作順・満杯時の入替え・平均の記録</summary><h3>まず、コピーを繰り返し使う</h3><p>最初に戻して、<strong>10番地 → 10番地 → 11番地 → 10番地 → 11番地</strong>の順に読みます。5回中3回はヒットし、合計は23単位です。キャッシュなしの45単位より少なくなります。</p><h3>次に、2個では置ききれないことを確かめる</h3><p>続けて<strong>12番地 → 10番地</strong>を読みます。12番地を読むと、最後に読んだのが古い10番地のコピーを入れ替えます。その後10番地はミスになります。主記憶の10番地には、数12が残っています。</p><p>この「最後に使ったのが最も古いコピーを入れ替える」方法を<strong>LRU</strong>と呼びます。実際のキャッシュの方式は機種によって異なります。</p><p data-cache-stats></p></details>
+<details class="cache-notes"><summary>このLabの簡略モデルについて</summary><p>1つの番地の数を1個のコピーとして扱い、2個まで置きます。読出しだけで、主記憶の数は変えません。実際には複数の連続した番地をひとまとまり（キャッシュライン）で扱うことが一般的です。書込み時の更新方法、複数段のキャッシュ、CPU間の整合性はこの実験では扱いません。</p></details>
+</section>
+<section id="exam" class="lesson-section" aria-labelledby="exam-title">
+<h2 id="exam-title"><span class="section-number">4.</span>試験ではこう問われる</h2>
+<h3>ヒット率：読出しのうち、何回コピーが見つかったか</h3><p>5回読んで3回ヒットしたら、ヒット率は<strong>3 ÷ 5 = 0.6 = 60%</strong>です。残りの2回はミスなので、ミス率は40%です。</p>
+<h3>平均の待ち時間：速い場合と遅い場合を混ぜる</h3><p>Labの条件で、100回中80回はヒットするとします。ヒットは1単位、ミスは<strong>確認を含めて10単位</strong>です。</p>
+<div class="example"><p>合計：80回 × 1単位 ＋ 20回 × 10単位 = 280単位</p><p>1回の平均：280単位 ÷ 100回 = <strong>2.8単位</strong></p><p class="formula">平均 = ヒット率 × ヒット時の時間 ＋ ミス率 × ミス時の時間</p><p>割合で書くと、0.8 × 1 ＋ 0.2 × 10 = 2.8です。</p></div>
+<p class="notice"><strong>ミス時の時間の定義を確認：</strong>主記憶の時間が「キャッシュの確認・読出しに追加する時間」なら足します。問題でミス時の合計時間が与えられていれば、確認時間を二重に足しません。</p>
+<p>初回のミスは10単位なので、キャッシュなしの9単位より長くなります。毎回新しい場所を読むだけなら、このモデルでは速くなりません。<strong>繰り返し使うデータがあること</strong>が効果を生みます。</p>
+</section>
+<section id="quiz" class="lesson-section" aria-labelledby="quiz-title" data-quiz data-quiz-version="1">
+<h2 id="quiz-title"><span class="section-number">5.</span>確認問題</h2><p>全4問です。理由も読み、場所・コピー・待ち時間を確かめましょう。</p><p class="small muted">教材用のオリジナル問題です。4問すべて回答すると直近の成績を記録します。</p><p class="small muted" data-quiz-saved></p>
+<form class="quiz-question" novalidate data-answer="ssd" data-explanation="主記憶や通常のCPUキャッシュは揮発性です。SSDはファイルを長期保存する場所で、電源を切っても内容が残ります。"><fieldset><legend>Q1. 通常、電源を切ってもファイルの内容が残る場所は？</legend><div class="quiz-options"><label><input type="radio" name="answer" value="cache" aria-describedby="feedback-q1"><span>CPUのキャッシュ</span></label><label><input type="radio" name="answer" value="memory" aria-describedby="feedback-q1"><span>主記憶</span></label><label><input type="radio" name="answer" value="ssd" aria-describedby="feedback-q1"><span>SSD</span></label></div></fieldset><button type="submit" class="button secondary" hidden>答え合わせ</button><p id="feedback-q1" data-feedback class="quiz-feedback" role="status" hidden></p></form>
+<form class="quiz-question" novalidate data-answer="copy" data-explanation="探すのは数10ではなく、10番地のコピーです。その箱の中身が12なら、CPUが読む数も12になります。"><fieldset><legend>Q2. 10番地の数を読みたいとき、キャッシュで「ヒット」するのは？</legend><div class="quiz-options"><label><input type="radio" name="answer" value="number" aria-describedby="feedback-q2"><span>10という数がどこかにあるとき</span></label><label><input type="radio" name="answer" value="copy" aria-describedby="feedback-q2"><span>10番地のコピーがあるとき</span></label><label><input type="radio" name="answer" value="empty" aria-describedby="feedback-q2"><span>キャッシュが空のとき</span></label></div></fieldset><button type="submit" class="button secondary" hidden>答え合わせ</button><p id="feedback-q2" data-feedback class="quiz-feedback" role="status" hidden></p></form>
+<form class="quiz-question" novalidate data-answer="stays" data-explanation="取り除くのはキャッシュのコピーだけです。この読出しLabでは主記憶の元の数を変えません。"><fieldset><legend>Q3. 10番地のコピーがキャッシュから取り除かれると、主記憶の10番地の数12は？</legend><div class="quiz-options"><label><input type="radio" name="answer" value="stays" aria-describedby="feedback-q3"><span>そのまま残る</span></label><label><input type="radio" name="answer" value="gone" aria-describedby="feedback-q3"><span>一緒に消える</span></label><label><input type="radio" name="answer" value="zero" aria-describedby="feedback-q3"><span>0になる</span></label></div></fieldset><button type="submit" class="button secondary" hidden>答え合わせ</button><p id="feedback-q3" data-feedback class="quiz-feedback" role="status" hidden></p></form>
+<form class="quiz-question" novalidate data-answer="2.8" data-explanation="80回×1＋20回×10＝280単位。100回で割ると2.8単位です。ミス時の10単位は確認を含むため、さらに1単位を足しません。"><fieldset><legend>Q4. 100回中80回がヒット。ヒット時1単位、ミス時は確認を含めて10単位なら、1回の平均待ち時間は？</legend><div class="quiz-options"><label><input type="radio" name="answer" value="1" aria-describedby="feedback-q4"><span>1単位</span></label><label><input type="radio" name="answer" value="2.8" aria-describedby="feedback-q4"><span>2.8単位</span></label><label><input type="radio" name="answer" value="10" aria-describedby="feedback-q4"><span>10単位</span></label></div></fieldset><button type="submit" class="button secondary" hidden>答え合わせ</button><p id="feedback-q4" data-feedback class="quiz-feedback" role="status" hidden></p></form>
+<p class="quiz-summary" data-quiz-summary role="status">0 / 4問回答</p><button type="button" class="button secondary" data-quiz-reset hidden>もう一度挑戦する</button></section>
+<section id="complete" class="lesson-section" aria-labelledby="complete-title"><div class="completion-panel"><h2 id="complete-title">学習を振り返る</h2><p>「10番地を読む」と「数10を読む」の違い、コピーが見つかると早い理由、入替えても元の数が残ることを説明できそうでしょうか。次は、CPUと周辺機器のやり取りを学びます。</p><p class="small muted">理解できたら学習完了を記録してください。確認問題の全問正解は条件ではありません。いつでも未完了に戻せます。</p><button type="button" class="button" data-complete hidden>この教材を学習完了にする</button><p class="completion-message" data-completion-message role="status"></p></div><nav class="lesson-nav" aria-label="教材の前後ナビゲーション"><a href="04-cpu.html"><span>前の教材</span>Lesson 04　CPU・命令実行</a><div><span>次の教材 · 準備中</span>Lesson 06　入出力・割込み</div></nav><p class="small"><a href="../index.html#curriculum">全体の教材一覧へ戻る</a></p></section>
+</article>
+    </div>
+  </main>
+  <footer class="site-footer"><div class="container"><p>支援士学習 · 科目A-1 技術基礎</p><p>進捗はこのブラウザに保存されます。端末間の同期はありません。</p></div></footer>
+</body>
+</html>
