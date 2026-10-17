@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="ポーリングと割込みの違いを、CPUの作業を1単位ずつ進めて学ぶ初学者向け教材。">
+  <title>Lesson 06 入出力・割込み | 科目A-1 技術基礎</title>
+  <script src="../js/theme.js"></script>
+  <link rel="stylesheet" href="../css/common.css">
+  <link rel="stylesheet" href="../css/lesson.css">
+  <link rel="stylesheet" href="../css/lab.css">
+  <link rel="stylesheet" href="../css/interrupt.css">
+  <script src="../js/curriculum.js" defer></script>
+  <script src="../js/progress.js" defer></script>
+  <script src="../js/common.js" defer></script>
+  <script src="../js/quiz.js" defer></script>
+  <script src="../js/labs/interrupt.js" defer></script>
+</head>
+<body data-lesson-id="06">
+  <a class="skip-link" href="#main">本文へ移動</a>
+  <header class="site-header"><div class="container header-inner"><a class="brand" href="../index.html">支援士学習<span>情報処理安全確保支援士 · 科目A-1</span></a><div class="header-actions"><a class="header-link" href="../index.html#curriculum">教材一覧</a><button type="button" class="button secondary theme-toggle" data-theme-toggle aria-label="ダークモード" aria-pressed="false" hidden>ダークモード：オフ</button></div></div></header>
+  <main id="main" class="container" tabindex="-1">
+    <p class="notice storage-notice" data-storage-notice role="status" hidden></p>
+    <p class="notice theme-notice" data-theme-notice role="status" hidden></p>
+    <noscript><p class="notice">JavaScriptが無効です。本文と例は読めますが、Lab・答え合わせ・進捗保存にはJavaScriptを有効にしてください。</p></noscript>
+    <nav class="breadcrumb" aria-label="パンくず"><a href="../index.html">全体目次</a> / <a href="../index.html#chapter-02">コンピュータ</a> / <span aria-current="page">入出力・割込み</span></nav>
+    <header class="lesson-heading">
+      <span class="status" data-lesson-status="06">未学習</span>
+      <h1>Lesson 06　入出力・割込み</h1>
+      <p>キーボードの入力を、CPUはずっと見張っているのでしょうか。待ち方の違いを確かめます。</p>
+      <div class="lesson-meta"><span>学習時間：10〜20分</span><span>前提知識：Lesson 04の「PC」</span><span>範囲：ポーリング・割込み・DMA</span></div>
+    </header>
+    <div class="lesson-layout">
+      <nav class="lesson-toc" aria-label="ページ内目次">
+        <h2>このページの内容</h2>
+        <ol><li><a href="#image">まずイメージを掴む</a></li><li><a href="#mechanism">仕組みを理解する</a></li><li><a href="#lab">触ってみる</a></li><li><a href="#exam">試験ではこう問われる</a></li><li><a href="#quiz">確認問題</a></li><li><a href="#complete">学習を振り返る</a></li></ol>
+      </nav>
+      <article class="lesson-body" aria-label="入出力・割込みの教材">
+<section class="objectives" aria-labelledby="objectives-title">
+<h2 id="objectives-title">このページで学ぶこと</h2><ul><li>ポーリング・割込み・DMAの違いを説明できる。</li><li>割込みの前にPCなどを退避する理由を説明できる。</li><li>CPUが入力を待つ間に何をしているかを、操作で比べられる。</li><li>外部割込みと内部割込みの例を分類できる。</li></ul>
+</section>
+<section id="image" class="lesson-section" aria-labelledby="image-title">
+<h2 id="image-title"><span class="section-number">1.</span>まずイメージを掴む</h2>
+<h3>入出力装置とは：CPUと主記憶の外にある、データの出入口</h3>
+<p>Lesson 04・05では、CPUと主記憶の中でデータが動く様子を見ました。しかし、キーで打った文字や、画面に出す絵は、CPUと主記憶の外とやり取りする必要があります。このやり取りをする機器を<strong>入出力装置</strong>と呼びます。</p>
+<table class="reference-table"><caption>入出力装置の例</caption><thead><tr><th scope="col">分類</th><th scope="col">例</th><th scope="col">データの向き</th></tr></thead><tbody><tr><th scope="row">入力装置</th><td>キーボード、マウス、カメラ</td><td>外からコンピュータへ入れる</td></tr><tr><th scope="row">出力装置</th><td>ディスプレイ、プリンタ、スピーカ</td><td>コンピュータから外へ出す</td></tr><tr><th scope="row">入出力の両方</th><td>SSD、LANアダプタ（ネットワークへの接続部品）</td><td>受け取りも送り出しもする</td></tr></tbody></table>
+<p class="small muted">SSDはLesson 05で「保存場所」として学びました。CPUから見ると主記憶の外にあるデータの出し入れ先なので、キーボードなどと同じ入出力の仕組みで扱います。</p>
+<h3>入力を待つ間、CPUはどうする？</h3>
+<p>CPUはとても速く動くため、主記憶やSSD、人の操作を待つ時間は、CPUから見ると非常に長くなります。どのくらい違うのか、数字で比べてみましょう。</p>
+<table class="reference-table"><caption>CPUから見た待ち時間の目安</caption><thead><tr><th scope="col">何をするか</th><th scope="col">かかる時間の目安</th><th scope="col">CPUの1回の動作の何倍か</th><th scope="col">1回の動作を1秒に置き換えると</th></tr></thead><tbody><tr><th scope="row">CPUの1回の動作<br><span class="small muted">（3GHzの1クロック）</span></th><td>約0.3ナノ秒</td><td>1倍</td><td>1秒</td></tr><tr><th scope="row">キャッシュ（L1）から読む</th><td>約1ナノ秒</td><td>約3倍</td><td>約3秒</td></tr><tr><th scope="row">主記憶から読む</th><td>約100ナノ秒</td><td>約300倍</td><td>約5分</td></tr><tr><th scope="row">SSDから読む</th><td>約0.1ミリ秒<br>（100マイクロ秒）</td><td>約30万倍</td><td>約3.5日</td></tr><tr><th scope="row">人が次のキーを押すまで</th><td>約0.2秒</td><td>約6億倍</td><td>約19年</td></tr></tbody></table>
+<p class="small muted">1ナノ秒は10億分の1秒、1マイクロ秒は100万分の1秒、1ミリ秒は1000分の1秒です。数値は桁の違いをつかむための目安で、製品や条件によって変わります。SSDは高速な製品（NVMe接続）の読出しを想定しています。</p>
+<p>CPUの1回の動作を1秒とすると、主記憶を待つのは約5分、SSDを待つのは約3.5日、人のキー入力を待つのは約19年です。<strong>キーを1回待つ間に、CPUは数億回も動作できます。</strong>その間ずっと「届いた？」と確認し続けるか、ほかの仕事を進めるかで、CPUの使い方が大きく変わります。</p>
+<p>宅配便を待っている日を考えます。届いたかどうかを何度も玄関まで見に行くと、そのたびに家の作業が止まります。チャイムが鳴ってから出れば、それまで自分の作業を続けられます。</p>
+<div class="example"><h3>見に行く方式と、知らせてもらう方式</h3><p><strong>ポーリング：</strong>CPUがキーボードなどの入出力装置へ「届いた？」と繰り返し確認する方式です。玄関を何度も見に行く待ち方です。</p><p><strong>割込み：</strong>キーボードなどの入出力装置の側から、CPUへ合図（割込み要求）を送る方式です。チャイムが鳴ってから出る待ち方です。</p><p>どちらも、入力を受け取るのはCPUです。違うのは、<strong>届いたことにどうやって気付くか</strong>です。</p></div>
+</section>
+<section id="mechanism" class="lesson-section" aria-labelledby="mechanism-title">
+<h2 id="mechanism-title"><span class="section-number">2.</span>仕組みを理解する</h2>
+<h3>入出力の3つの方式：気付き方と運び方</h3>
+<table class="reference-table"><caption>入出力の制御方式を比べる</caption><thead><tr><th scope="col">方式</th><th scope="col">仕組み</th><th scope="col">CPUへの影響</th></tr></thead><tbody><tr><th scope="row">ポーリング<br>（プログラム制御）</th><td>CPUがキーボードなどの状態を繰り返し確認する</td><td>確認するたびにCPUの時間を使う。間隔を空けると、気付くのが遅れる</td></tr><tr><th scope="row">割込み</th><td>キーボードなどの入出力装置が、割込み要求という合図でCPUに知らせる</td><td>待つ間は別の処理を進められる</td></tr><tr><th scope="row">DMA</th><td>DMAコントローラ（データ運搬専用の回路）が、SSDなどの入出力装置と主記憶の間でデータを直接運ぶ</td><td>CPUは運ぶ範囲を指示するだけ。運び終わりは割込みで知る</td></tr></tbody></table>
+<p class="notice">ポーリングと割込みは<strong>「届いたことにどう気付くか」</strong>の違いです。DMAは<strong>「データを誰が運ぶか」</strong>の違いです。DMAも、運び終わったことを割込みでCPUに知らせます。</p>
+<h3>DMA：データ運びを専用の回路に任せる</h3>
+<p>SSDからファイルを読み込むとき、運ぶデータは数千〜数百万バイトにもなります。DMAを使わない場合、CPUが入出力装置からデータを受け取り、主記憶へ書く作業を何度も繰り返します。運んでいる間、CPUはほかの処理を進めにくくなります。</p>
+<p><strong>DMA（Direct Memory Access：直接メモリアクセス）</strong>は、この運搬を<strong>DMAコントローラ</strong>に任せる方式です。DMAコントローラは、PCの基板上の部品や、SSD・LANアダプタなどの入出力装置の中に組み込まれた回路です。CPUのようにさまざまなプログラムを実行するのではなく、「どこから・どこへ・どれだけ運ぶか」の指示どおりにデータを運ぶことだけを担当します。</p>
+<figure class="example"><img class="reference-image" src="../assets/images/dma-transfer.svg" width="680" height="400" alt="DMAなしでは、SSDなどの入出力装置から主記憶へのデータをCPUが1つずつ中継する。DMAありでは、CPUが運ぶ範囲を指示すると、DMAコントローラが入出力装置から主記憶へデータを直接運ぶ。その間CPUはほかの処理を進め、運び終わると割込みで知らされる。"><figcaption class="small muted">DMAなしとDMAありの比較。DMAありでは、CPUは指示と完了の受取りだけを行います。</figcaption></figure>
+<ol><li>CPUがDMAコントローラへ、運ぶ元・運ぶ先の番地・量を指示する。</li><li>DMAコントローラが、入出力装置と主記憶の間でデータを直接運ぶ。その間、CPUはほかの処理を進める。</li><li>運び終わると、DMAコントローラが割込みでCPUに知らせる。</li></ol>
+<div class="example"><h3>たとえるなら、引っ越しの運送業者</h3><p>段ボールを自分で1箱ずつ運ぶと、その間ほかのことができません。運送業者に「この部屋の荷物を、あの部屋へ全部」と頼めば、自分は別の作業ができ、終わったら連絡がもらえます。<strong>CPUが依頼主、DMAコントローラが運送業者</strong>です。</p></div>
+<h3>割込みが来たら、戻り先を覚えてから出かける</h3>
+<p>割込み要求が来ても、CPUはその瞬間に処理を投げ出しません。<strong>実行中の命令を終えてから</strong>受け付けます。そのあと、元の処理へ戻れるように準備します。</p>
+<figure class="example"><img class="reference-image" src="../assets/images/interrupt-flow.svg" width="680" height="300" alt="元の処理の実行中に割込み要求が届く。実行中の命令を終えてからPCなどの状態を退避し、割込み処理を行う。終わったら状態を復帰し、元の処理を続きから再開する。"><figcaption class="small muted">割込み処理の流れ。退避と復帰で、元の処理の続きを失わないようにします。</figcaption></figure>
+<ol><li>割込み要求を受け付ける（実行中の命令は終えてから）。</li><li><strong>退避：</strong>PC（次に実行する命令の場所）などの値を、決まった場所へ保存する。</li><li>PCを割込み処理の命令へ切り替え、割込み処理（入力の受取りなど）を行う。</li><li><strong>復帰：</strong>保存しておいた値をPCなどへ戻す。</li><li>元の処理を、中断した続きから再開する。</li></ol>
+<p class="notice">Lesson 04で学んだとおり、PCは「次に実行する命令の場所」です。PCを保存せずに割込み処理へ切り替えると、<strong>どこまで進んだか分からなくなります</strong>。退避は、元の処理の続きを失わないための手順です。</p>
+<h3>割込みには、外から来るものと中から起こるものがある</h3>
+<table class="reference-table"><caption>割込みの種類と例</caption><thead><tr><th scope="col">種類</th><th scope="col">きっかけ</th><th scope="col">例</th></tr></thead><tbody><tr><th scope="row">外部割込み</th><td>実行中のプログラムの外の出来事</td><td>入出力の完了（キー入力が届いた）、タイマによる一定時間の経過、電源異常やハードウェア障害（機械チェック）</td></tr><tr><th scope="row">内部割込み</th><td>実行中のプログラムの命令そのもの</td><td>ゼロで割る・桁あふれなどの演算の異常、不正な命令、OSの機能の呼出し（SVC）、ページフォールト</td></tr></tbody></table>
+<p>見分けるときは、<strong>今実行している命令が原因かどうか</strong>を考えます。ゼロで割る命令を実行したなら、原因はプログラムの中にあるので内部割込みです。キーが押されたのは、プログラムの外の出来事なので外部割込みです。</p>
+<details><summary>試験用語：SVC・ページフォールト・タイマ割込み</summary><ul><li><strong>SVC（スーパバイザコール）：</strong>プログラムが、ファイルの読込みなどOSの機能を呼び出すときに使う割込みです。プログラム自身の命令で起こすので内部割込みです。</li><li><strong>ページフォールト：</strong>必要なデータが主記憶にないときに起こる割込みです。Lesson 09「仮想記憶」で詳しく扱います。</li><li><strong>タイマ割込み：</strong>タイマ（一定時間ごとに合図を出す回路）からCPUへ送られる合図です。OSが複数のプログラムを順に実行する仕組みで使います（Lesson 08「スケジューリング」）。</li></ul></details>
+<details><summary>セキュリティとのつながり：DMAとデバイスドライバ</summary><p>入出力装置を動かすには、OSに組み込む<strong>デバイスドライバ</strong>というソフトウェアを使います。USB機器を接続すると、OSが対応するドライバでその機器を制御します。</p><p>DMAはCPUを通さずに主記憶へ読み書きできます。そのため、悪意のある周辺機器がDMAで主記憶の内容を盗み見たり書き換えたりする攻撃が知られています。OSやハードウェアは、周辺機器が読み書きできる主記憶の範囲を制限する仕組み（IOMMUなど）で対策します。</p></details>
+</section>
+<section id="lab" class="lesson-section" aria-labelledby="lab-title">
+<h2 id="lab-title"><span class="section-number">3.</span>触ってみる</h2>
+<div class="example io-goal"><h3>このLabで確かめること</h3><p><strong>キーを待っている間に計算を進めることと、キーが押されたらすぐ気付くことを、両立できるかどうか</strong>を比べます。3つの方式を同じ時間の流れに並べて、同時に進めます。<strong>3つの行は、どれも同じ1台のCPUです。</strong>違うのは、キーの待ち方だけです。</p><ul><li><strong>CPUの仕事：</strong>キー入力の受取りと、たまっている計算です。計算はキー入力を使わない別の仕事なので、いつでも進められます。</li><li><strong>目標：</strong>キーが押されたら、できるだけ早く受け取る（人を待たせない）。そのうえで、計算もできるだけ進めたい。</li><li><strong>ポーリング（確認だけ繰り返す）：</strong>待つ間は「押された？」の確認だけを繰り返します（ビジーウェイト）。すぐ気付けますが、待つ間はほかの仕事が進みません。確認を最大まで増やした極端な例です。</li><li><strong>ポーリング（3単位ごとに確認）：</strong>計算を2個進めるごとに見に行きます。計算は進みますが、確認の合間に押されると、気付くのが遅れます。</li><li><strong>割込み：</strong>押されるとキーボードが合図を送ってくれます。合図が来るまで、見に行かずに計算を進められます。</li></ul><h4>進め方</h4><ol class="io-steps"><li>「1単位進める」を数回押し、キーを押す前の3つの行を比べる。</li><li>「キーを押す」を押し、続けて「1単位進める」を押して、各行がいつ受け取るかを確かめる。</li><li>押すタイミングを変えて何度か試し、「進んだ計算」と「受け取るまで」を比べる。</li></ol></div>
+<noscript><p class="notice">JavaScriptを有効にするとLabを操作できます。例えば時刻3の終わりにキーを押すと、確認だけを繰り返すポーリングは「確認・確認・確認・受取」で計算は0個、3単位ごとに確認するポーリングは「計1・計2・確認・計3・計4・受取」で受け取るまで3単位、割込みは「計1・計2・計3・受取」で受け取るまで1単位です。</p></noscript>
+<div class="lab" data-io-lab hidden>
+<h3>計算を進めながら、キーにすぐ気付けるのはどれ？</h3>
+<p class="prediction"><strong>予想：</strong>計算をたくさん進めながら、キーが押されたらすぐ受け取れるのは、3つのうちどの方式でしょうか？</p>
+<div class="io-scroll" tabindex="0" role="region" aria-label="3つの方式の時間割。狭い画面では横スクロールできます。">
+<svg class="io-svg" data-io-timeline viewBox="0 0 880 210" role="img" aria-labelledby="io-svg-title io-svg-desc"><title id="io-svg-title">2種類のポーリングと割込みの時間割</title><desc id="io-svg-desc" data-io-desc>まだ進めていません。</desc></svg>
+</div>
+<ul class="io-legend" aria-label="時間割の枠の見方"><li><b>確認</b>：見に行っただけ（仕事は進まない）</li><li><b>計1・計2…</b>：計算（仕事が進む）</li><li><b>受取</b>：キーを受け取る（割込みは退避・受取・復帰を1枠に）</li><li><b>▲キー</b>：キーを押した時点</li></ul>
+<div class="lab-result io-feedback"><div data-io-lines></div><p class="io-conclusion" data-io-conclusion></p></div>
+<p class="sr-only" data-io-status role="status" aria-atomic="true"></p>
+<div class="lab-controls"><button type="button" class="button" data-io-next>1単位進める</button><button type="button" class="button secondary" data-io-key>キーを押す</button><button type="button" class="button secondary" data-io-reset>最初に戻す</button><span class="io-key-state" data-io-key-state>キー：まだ押していない</span></div>
+</div>
+<p class="small muted">1枠＝1単位は実験用の目盛りです。実際には、人がキーを押す間隔はCPUの1回の動作の数億倍です（「1. まずイメージを掴む」の表）。確認1回や、割込みの退避・復帰は、それに比べてごく短い時間です。このLabでは見やすくするため、どれも1枠で表しています。</p>
+<details class="io-notes"><summary>確認の間隔の決め方と、確認だけを繰り返す待ち方が使われる場面</summary><p>ポーリングでは、確認の間隔を短くするほど早く気付けますが、確認の回数（無駄）が増えます。長くするほど無駄は減りますが、気付くのが遅れます。実際には、相手の装置の速さや、どこまで遅れてよいかで間隔を決めます。試験でいう「周期的に状態を調べる」は、このように間隔を決めて確認する方式です。</p><p>一方、数マイクロ秒で終わるような非常に短い待ちでは、割込みの退避・復帰の手間を避けるため、あえてポーリングで待つこともあります。どちらが常に優れているというより、待ち時間の長さで使い分けます。</p><p>確認だけを繰り返す待ち方（ビジーウェイト）が使われるのは、次のような場面です。</p><ul><li><strong>待ち時間がごく短いとき：</strong>数マイクロ秒で終わる装置を待つ場合など。割込みの退避・復帰より、確認を繰り返すほうが速いことがあります。</li><li><strong>ほかに仕事がない小さな機器：</strong>家電を制御するマイコンなど。CPUを空けても使い道がないので、確認だけを繰り返しても損がありません。</li><li><strong>高速通信の専用処理：</strong>大量の通信を処理するサーバで、CPUのコアを1つ通信の確認専用に割り当てることがあります。</li></ul><p>反対に、パソコンで人のキー入力を待つときには使いません。数億回分の動作が確認だけで消えてしまうからです。</p></details>
+<details class="io-notes"><summary>このLabの簡略モデルについて</summary><p>割込みの退避・受取・復帰を1枠にまとめています。実際には、PCのほか計算途中の値を持つレジスタなども退避します。退避と復帰の流れは「2. 仕組みを理解する」の図で確認してください。キーは押した時刻の終わりに届き、次の枠以降で処理するものとします。3単位ごとのポーリングは時刻3・6・9・12に確認します。複数の割込みが重なる場合の優先順位や、DMAはこのLabでは扱いません。</p></details>
+</section>
+<section id="exam" class="lesson-section" aria-labelledby="exam-title">
+<h2 id="exam-title"><span class="section-number">4.</span>試験ではこう問われる</h2>
+<h3>「内部割込みに該当するものはどれか」</h3><p>選択肢を1つずつ、<strong>実行中の命令が原因かどうか</strong>で分けます。</p>
+<div class="example"><ul><li>ゼロで割る命令を実行した → 命令が原因なので<strong>内部割込み</strong></li><li>キーボードからの入力が完了した → キーボードで起きた出来事なので外部割込み</li><li>タイマが一定時間の経過を知らせた → タイマからの合図なので外部割込み</li><li>電源電圧が異常に下がった → ハードウェアの出来事なので外部割込み</li></ul></div>
+<p class="notice"><strong>タイマ割込みは外部割込み：</strong>「時間が来た」はプログラムの命令ではなく、タイマという回路からの合図です。OSが使う仕組みでも、きっかけは外にあります。</p>
+<h3>方式の説明を選ぶ問題</h3><p>「CPUを介さずに、入出力装置と主記憶の間でデータを転送する」はDMAです。「CPUが周期的に入出力装置の状態を調べる」はポーリングです。「入出力装置などからの要求で、実行中の処理を中断して別の処理を行う」は割込みです。</p>
+<p>割込み処理の手順では、<strong>中断した処理を再開するために、PCなどの状態を退避する</strong>ことが問われます。退避しなければ、元の処理の続きが分からなくなります。</p>
+</section>
+<section id="quiz" class="lesson-section" aria-labelledby="quiz-title" data-quiz data-quiz-version="1">
+<h2 id="quiz-title"><span class="section-number">5.</span>確認問題</h2><p>全4問です。理由も読み、待ち方と割込みの種類を確かめましょう。</p><p class="small muted">教材用のオリジナル問題です。4問すべて回答すると直近の成績を記録します。</p><p class="small muted" data-quiz-saved></p>
+<form class="quiz-question" novalidate data-answer="zero" data-explanation="ゼロで割る命令は、実行中のプログラムの命令が原因なので内部割込みです。キー入力の完了とタイマは、プログラムの外から来る外部割込みです。"><fieldset><legend>Q1. 内部割込みに該当するものは？</legend><div class="quiz-options"><label><input type="radio" name="answer" value="key" aria-describedby="feedback-q1"><span>キーボードからの入力が完了した</span></label><label><input type="radio" name="answer" value="zero" aria-describedby="feedback-q1"><span>ゼロで割る命令を実行した</span></label><label><input type="radio" name="answer" value="timer" aria-describedby="feedback-q1"><span>タイマが一定時間の経過を知らせた</span></label></div></fieldset><button type="submit" class="button secondary" hidden>答え合わせ</button><p id="feedback-q1" data-feedback class="quiz-feedback" role="status" hidden></p></form>
+<form class="quiz-question" novalidate data-answer="resume" data-explanation="PCは次に実行する命令の場所です。割込み処理へ切り替える前に保存しておけば、終わったあとに元の処理の続きから再開できます。"><fieldset><legend>Q2. 割込み処理を始める前に、PCの値を退避する理由は？</legend><div class="quiz-options"><label><input type="radio" name="answer" value="resume" aria-describedby="feedback-q2"><span>元の処理を、中断した続きから再開するため</span></label><label><input type="radio" name="answer" value="speed" aria-describedby="feedback-q2"><span>割込み処理の計算を速くするため</span></label><label><input type="radio" name="answer" value="save" aria-describedby="feedback-q2"><span>入力したデータをSSDに保存するため</span></label></div></fieldset><button type="submit" class="button secondary" hidden>答え合わせ</button><p id="feedback-q2" data-feedback class="quiz-feedback" role="status" hidden></p></form>
+<form class="quiz-question" novalidate data-answer="dma" data-explanation="DMAは、DMAコントローラが入出力装置と主記憶の間でデータを直接転送する方式です。CPUは開始を指示し、完了は割込みで知ります。"><fieldset><legend>Q3. CPUを介さずに、入出力装置と主記憶の間でデータを転送する方式は？</legend><div class="quiz-options"><label><input type="radio" name="answer" value="polling" aria-describedby="feedback-q3"><span>ポーリング</span></label><label><input type="radio" name="answer" value="dma" aria-describedby="feedback-q3"><span>DMA</span></label><label><input type="radio" name="answer" value="svc" aria-describedby="feedback-q3"><span>SVC</span></label></div></fieldset><button type="submit" class="button secondary" hidden>答え合わせ</button><p id="feedback-q3" data-feedback class="quiz-feedback" role="status" hidden></p></form>
+<form class="quiz-question" novalidate data-answer="work" data-explanation="割込みでは、入力が届くとキーボードから合図が来ます。それまでCPUは、確認を繰り返さずに自分の処理を進められます。"><fieldset><legend>Q4. 割込み方式で、キー入力が届くのを待つ間のCPUは？</legend><div class="quiz-options"><label><input type="radio" name="answer" value="check" aria-describedby="feedback-q4"><span>入力が届いたかを繰り返し確認し続ける</span></label><label><input type="radio" name="answer" value="stop" aria-describedby="feedback-q4"><span>入力が届くまで何もせずに止まる</span></label><label><input type="radio" name="answer" value="work" aria-describedby="feedback-q4"><span>ほかの処理を進められる</span></label></div></fieldset><button type="submit" class="button secondary" hidden>答え合わせ</button><p id="feedback-q4" data-feedback class="quiz-feedback" role="status" hidden></p></form>
+<p class="quiz-summary" data-quiz-summary role="status">0 / 4問回答</p><button type="button" class="button secondary" data-quiz-reset hidden>もう一度挑戦する</button></section>
+<section id="complete" class="lesson-section" aria-labelledby="complete-title"><div class="completion-panel"><h2 id="complete-title">学習を振り返る</h2><p>ポーリングと割込みで、待つ間のCPUの使い方がどう違うか説明できそうでしょうか。退避と復帰の理由、外部割込みと内部割込みの分け方も確かめてください。次は、OSが複数の処理をどう管理するかを学びます。</p><p class="small muted">理解できたら学習完了を記録してください。確認問題の全問正解は条件ではありません。いつでも未完了に戻せます。</p><button type="button" class="button" data-complete hidden>この教材を学習完了にする</button><p class="completion-message" data-completion-message role="status"></p></div><nav class="lesson-nav" aria-label="教材の前後ナビゲーション"><a href="05-memory-cache.html"><span>前の教材</span>Lesson 05　メモリ・キャッシュ</a><div><span>次の教材 · 準備中</span>Lesson 07　プロセス・スレッド</div></nav><p class="small"><a href="../index.html#curriculum">全体の教材一覧へ戻る</a></p></section>
+</article>
+    </div>
+  </main>
+  <footer class="site-footer"><div class="container"><p>支援士学習 · 科目A-1 技術基礎</p><p>進捗はこのブラウザに保存されます。端末間の同期はありません。</p></div></footer>
+</body>
+</html>

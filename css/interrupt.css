@@ -1,0 +1,41 @@
+body[data-lesson-id="06"] #lab { padding-top: 12px; }
+.io-goal ul { margin-block: 8px 0; }
+[data-io-lab] { padding: 16px; margin-block: 12px; }
+[data-io-lab] h3 { font-size: 20px; margin-bottom: 8px; }
+[data-io-lab] .prediction { padding: 8px 12px; margin-block: 8px; }
+.io-goal h4 { margin: 12px 0 4px; }
+.io-steps { margin-block: 4px 0; padding-left: 1.5em; }
+[data-io-lab] .lab-controls { margin-block: 8px 0; }
+.io-scroll { overflow-x: auto; padding: 4px; margin-block: 8px; scrollbar-gutter: stable; }
+.io-svg { display: block; width: 100%; min-width: 700px; height: auto; background: var(--color-bg); border: 1px solid var(--color-border); border-radius: 8px; }
+.io-svg text { fill: var(--color-text); font: 17px var(--font-body); }
+.io-svg .io-row-label { font-weight: 700; }
+.io-svg .io-time { fill: var(--color-muted); font: 15px var(--font-number); }
+.io-svg .io-cell-label { font-weight: 700; }
+.io-svg .io-note { fill: var(--color-muted); font-size: 14px; }
+.io-svg .io-stat { font: 700 18px var(--font-body); }
+.io-cell { fill: var(--color-surface); stroke: var(--color-border); stroke-width: 1.5; stroke-dasharray: 4 4; }
+.io-cell[data-kind="calc"] { fill: var(--color-tint); stroke: var(--color-primary); stroke-dasharray: none; }
+.io-cell[data-kind="check"] { fill: var(--color-planned-bg); stroke: var(--color-muted); }
+.io-cell[data-kind="receive"] { fill: var(--color-success-bg); stroke: var(--color-success); stroke-dasharray: none; }
+.io-cell.io-current { stroke-width: 4; }
+.io-arrival { fill: none; stroke: var(--color-focus); stroke-width: 3; stroke-dasharray: 6 5; }
+.io-legend { display: flex; flex-wrap: wrap; gap: 0 20px; padding: 0; margin: 0; list-style: none; font-size: 14px; }
+.io-legend li { margin: 0; }
+.io-key-state { align-self: center; font-weight: 700; font-size: 15px; }
+.io-feedback { padding: 10px 14px; margin-block: 8px; min-height: 150px; font-size: 15px; line-height: 1.6; }
+.io-feedback p { margin: 0 0 2px; }
+.io-conclusion { font-weight: 700; }
+.io-notes { margin-block: 12px; }
+.io-notes summary { font-weight: 700; cursor: pointer; color: var(--color-primary); }
+.io-notes summary:hover { color: var(--color-primary-hover); }
+@media (max-width: 760px) {
+  .io-feedback { min-height: 0; }
+}
+@media (max-width: 520px) {
+  [data-io-lab] .lab-controls .button { flex: 1 1 100%; }
+}
+@media (forced-colors: active) {
+  .io-cell.io-current { stroke: Highlight; }
+  .io-arrival { stroke: CanvasText; }
+}

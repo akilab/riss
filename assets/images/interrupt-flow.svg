@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 300" role="img" aria-labelledby="title desc">
+  <title id="title">割込み処理の流れ</title><desc id="desc">元の処理の実行中に割込み要求が届く。実行中の命令を終えてからPCなどの状態を退避し、割込み処理を行う。終わったら状態を復帰し、元の処理を続きから再開する。</desc>
+  <rect width="680" height="300" rx="12" fill="#f5f8fc"/>
+  <g stroke="#172d45" stroke-width="2" fill="white"><rect x="20" y="40" width="190" height="80" rx="8"/><rect x="470" y="40" width="190" height="80" rx="8"/><rect x="245" y="180" width="190" height="80" rx="8"/></g>
+  <g fill="none" stroke="#172d45" stroke-width="3" stroke-linejoin="round"><path d="M210 80H465M453 70L465 80L453 90"/><path d="M115 120V220H240M228 210L240 220L228 230"/><path d="M435 220H565V125M555 137L565 125L575 137"/></g>
+  <g fill="none" stroke="#a35200" stroke-width="3" stroke-dasharray="8 6"><path d="M115 10V36M105 26L115 36L125 26"/></g>
+  <g fill="#172d45" font-family="Meiryo, sans-serif" text-anchor="middle"><text x="115" y="72" font-size="21" font-weight="700">元の処理</text><text x="115" y="102" font-size="17">命令を順に実行</text><text x="565" y="72" font-size="21" font-weight="700">元の処理を再開</text><text x="565" y="102" font-size="17">退避した続きから</text><text x="340" y="212" font-size="21" font-weight="700">割込み処理</text><text x="340" y="242" font-size="17">入力の受取りなど</text><text x="340" y="68" font-size="16">割込みがなければ続行</text><text x="178" y="165" font-size="17" font-weight="700">① 状態を退避</text><text x="178" y="190" font-size="15">PCなどを保存</text><text x="505" y="165" font-size="17" font-weight="700">② 状態を復帰</text><text x="505" y="190" font-size="15">保存した値を戻す</text><text x="230" y="25" font-size="16" text-anchor="start">割込み要求（命令を終えてから受け付ける）</text><text x="340" y="290" font-size="16">点線の矢印＝外から届く合図</text></g>
+</svg>
