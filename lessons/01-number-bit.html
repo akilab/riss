@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="../css/common.css">
   <link rel="stylesheet" href="../css/lesson.css">
   <link rel="stylesheet" href="../css/lab.css">
+  <link rel="stylesheet" href="../css/number-system.css">
   <script src="../js/curriculum.js" defer></script>
   <script src="../js/progress.js" defer></script>
   <script src="../js/common.js" defer></script>
@@ -27,7 +28,7 @@
       <span class="status" data-lesson-status="01">未学習</span>
       <h1>Lesson 01　進数・bit</h1>
       <p>0と1の組合せで、どうやって数を表すのでしょうか。8個のスイッチで確かめてみましょう。</p>
-      <div class="lesson-meta"><span>学習時間：10〜20分</span><span>前提知識：不要</span><span>範囲：0〜255の符号なし整数</span></div>
+      <div class="lesson-meta"><span>学習時間：10〜20分</span><span>前提知識：不要</span><span>範囲：bit・byte・2進数・16進数（0〜255の数）</span></div>
     </header>
     <div class="lesson-layout">
       <nav class="lesson-toc" aria-label="ページ内目次">
@@ -41,6 +42,12 @@
         </section>
         <section id="image" class="lesson-section" aria-labelledby="image-title">
           <h2 id="image-title"><span class="section-number">1.</span>まずイメージを掴む</h2>
+          <div class="example">
+            <h3>なぜ、支援士の勉強で0と1から始めるの？</h3>
+            <p>コンピュータの中では、文字も画像も通信も、すべて0と1の並びとして扱われます。セキュリティの話題にも、bitや16進数がそのまま出てきます。</p>
+            <ul><li>IPアドレス（IPv4）は32bitの数です。</li><li>暗号の鍵の長さは「128bit」「256bit」のようにbitで表します。</li><li>ハッシュ値やMACアドレスは、16進数で表示されることが多いです。</li></ul>
+            <p>このページで学ぶ「重み」と「何通り」の考え方は、これらを理解する土台になります。</p>
+          </div>
           <p>電気のスイッチには、OFFとONの2つの状態があります。この2つを、それぞれ<strong>0と1</strong>で表すと考えてください。</p>
           <p>0か1のどちらかを表す、ひとつ分の単位が<strong>bit（ビット）</strong>です。ここでは、スイッチ1個が1bitに対応します。</p>
           <div class="example">
@@ -54,7 +61,7 @@
         <section id="mechanism" class="lesson-section" aria-labelledby="mechanism-title">
           <h2 id="mechanism-title"><span class="section-number">2.</span>仕組みを理解する</h2>
           <h3>普段の数も、桁ごとに重みがある</h3>
-          <p>普段使う10進数は、0〜9の10種類の数字を使います。例えば「178」の1、7、8は、場所によって役割が違います。</p>
+          <p>普段使う10進数は、0〜9の10種類の数字を使います。例えば「178」の1、7、8は、場所によって役割が違います。その桁の数字1つが表す大きさを、この教材では<strong>重み</strong>と呼びます。</p>
           <div class="example">
             <div class="place-values"><div class="place-value">百の位<strong>1</strong>重み100</div><div class="place-value">十の位<strong>7</strong>重み10</div><div class="place-value">一の位<strong>8</strong>重み1</div></div>
             <p class="formula">1 × 100 + 7 × 10 + 8 × 1 = 178</p>
@@ -63,31 +70,47 @@
           <h3>2進数の重みは、右から1、2、4、8…</h3>
           <p>2進数で使う数字は0と1だけです。重みは、右から左へ進むと<strong>2倍</strong>になります。各桁の数字と重みを掛けて足す考え方は、10進数と同じです。</p>
           <p>1の桁では重みを足し、0の桁では足しません。例えば2進数の<code>1011</code>は、<code>8 + 2 + 1 = 11</code>です。</p>
+          <h3>10進数を2進数に直す：大きい重みから引いていく</h3>
+          <p>逆に、10進数を2進数に直すときは、<strong>大きい重みから順に、残りの数から引けるかどうか</strong>を見ます。引けるならそのbitは1にして引き、引けなければ0にします。10進数の100で試してみましょう。</p>
+          <table class="reference-table">
+            <caption>10進数の100を8bitの2進数に直す</caption>
+            <thead><tr><th scope="col">重み</th><th scope="col">残りから引ける？</th><th scope="col">bit</th><th scope="col">引いた後の残り</th></tr></thead>
+            <tbody><tr><td>128</td><td>100から128は引けない</td><td class="number">0</td><td>100</td></tr><tr><td>64</td><td>100 − 64 = 36</td><td class="number">1</td><td>36</td></tr><tr><td>32</td><td>36 − 32 = 4</td><td class="number">1</td><td>4</td></tr><tr><td>16</td><td>4から16は引けない</td><td class="number">0</td><td>4</td></tr><tr><td>8</td><td>4から8は引けない</td><td class="number">0</td><td>4</td></tr><tr><td>4</td><td>4 − 4 = 0</td><td class="number">1</td><td>0</td></tr><tr><td>2</td><td>残りは0</td><td class="number">0</td><td>0</td></tr><tr><td>1</td><td>残りは0</td><td class="number">0</td><td>0</td></tr></tbody>
+          </table>
+          <p>表の上（重み128）のbitから順に、左から並べると<code>01100100</code>です。確かめると<code>64 + 32 + 4 = 100</code>になります。</p>
           <p class="notice">同じ「10」という表記でも、10進数なら十、2進数なら二です。この教材では進数のラベルを付けて区別します。</p>
           <h3>8bitが1byte。表せる値は0〜255</h3>
           <p><strong>8bit = 1byte（バイト）</strong>です。ファイルサイズなどで使うbyteは、bitを8個まとめた単位です。</p>
-          <p>8bitの組合せは、<code>2 × 2 × 2 × 2 × 2 × 2 × 2 × 2 = 256</code>通りです。これを短く<code>2⁸</code>（2を8回掛ける）と書きます。</p>
-          <p>符号なし整数とは、ここでは負の数を扱わず0以上の整数を表す方法です。0も1通りとして含めるので、8bitの範囲は<strong>0〜255</strong>です。</p>
+          <p>8bitの組合せは、<code>2 × 2 × 2 × 2 × 2 × 2 × 2 × 2 = 256</code>通りです。これを短く<code>2⁸</code>（2を8回掛ける）と書きます。一般に、<strong>n bitなら2ⁿ通り</strong>です（nにはbitの数が入ります）。</p>
+          <p>256通りの並びに、<code>00000000</code>を0、<code>00000001</code>を1…と、0から順に値を割り当てます。0から数え始めるので、256番目の並び<code>11111111</code>は<strong>255</strong>です。つまり8bitで表せるのは<strong>0〜255</strong>で、最大値は<code>256 − 1 = 255</code>です。</p>
+          <p class="small muted">このように0以上の整数だけを表す方法を<strong>符号なし整数</strong>と呼びます。符号とは、＋・−のことです。負の数の表し方は、このページでは扱いません。</p>
+          <h3>bitが増えると、組合せは急激に増える</h3>
+          <div class="table-scroll" tabindex="0" role="region" aria-label="bit数と組合せの数の表。狭い画面では横スクロールできます。"><table class="reference-table bit-scale-table">
+            <caption>bit数と表せる組合せの数</caption>
+            <thead><tr><th scope="col">bit数</th><th scope="col">組合せの数</th><th scope="col">最大値（0以上の整数）</th><th scope="col">身近な例</th></tr></thead>
+            <tbody><tr><td>1bit</td><td>2通り</td><td class="number">1</td><td>ON／OFF、はい／いいえ</td></tr><tr><td>4bit</td><td>16通り</td><td class="number">15</td><td>16進数の1桁</td></tr><tr><td>8bit（1byte）</td><td>256通り</td><td class="number">255</td><td>英数字1文字、IPv4アドレスの区切り1つ</td></tr><tr><td>16bit</td><td>65,536通り</td><td class="number">65,535</td><td>通信のポート番号</td></tr><tr><td>32bit</td><td>約43億通り</td><td class="number">4,294,967,295</td><td>IPv4アドレスの総数</td></tr><tr><td>64bit</td><td>約1,845京通り</td><td class="number">18,446,744,073,709,551,615</td><td>64bitのCPUが一度に扱う数の幅（Lesson 04のレジスタ）</td></tr><tr><td>128bit</td><td>約3.4×10³⁸通り（39桁の数）</td><td>約3.4×10³⁸</td><td>IPv6アドレス、暗号の鍵（AES-128）</td></tr></tbody>
+          </table></div>
+          <p>どの行も、最大値は「組合せの数 − 1」です。64bitの最大値は20桁にもなります。1bit増えるだけで2倍、8bit増えると256倍になります。インターネットにつながる機器が増えてIPv4アドレス（約43億個）が足りなくなったことや、128bitの鍵をすべて試して破るのが現実的でないことも、この増え方から説明できます。</p>
           <h3>16進数なら、4bitを1桁にまとめられる</h3>
+          <p>2進数は<code>10110010</code>のように桁が長く、読み間違えやすい表記です。そこで、4bitを1桁にまとめて短く書ける<strong>16進数</strong>がよく使われます。MACアドレス（例：<code>00:1A:2B:3C:4D:5E</code>）、Webのカラーコード（例：<code>#FF8000</code>）、ハッシュ値などで目にします。</p>
           <p>16進数は0〜9に加えて、A、B、C、D、E、Fを使います。Aは10、Bは11、…、Fは15を表します。</p>
           <table class="reference-table">
             <caption>10以上を表す16進数の数字</caption>
             <thead><tr><th scope="col">10進数</th><th scope="col">16進数</th><th scope="col">2進数（4bit）</th></tr></thead>
             <tbody><tr><td>10</td><td class="number">A</td><td class="number">1010</td></tr><tr><td>11</td><td class="number">B</td><td class="number">1011</td></tr><tr><td>12</td><td class="number">C</td><td class="number">1100</td></tr><tr><td>13</td><td class="number">D</td><td class="number">1101</td></tr><tr><td>14</td><td class="number">E</td><td class="number">1110</td></tr><tr><td>15</td><td class="number">F</td><td class="number">1111</td></tr></tbody>
           </table>
-          <p>4bitは16通りなので、16進数の1桁とちょうど対応します。8bitを上位4bit（左側）と下位4bit（右側）に分けてみましょう。</p>
+          <p>4bitは16通りなので、16進数の1桁とちょうど対応します。8bitを、値の大きい左側の<strong>上位4bit</strong>と、右側の<strong>下位4bit</strong>に分けてみましょう。</p>
           <div class="nibble-example"><div>上位4bit<strong>1011 → B</strong></div><div>下位4bit<strong>0010 → 2</strong></div></div>
-          <p>2進数<code>10110010</code>は16進数<code>B2</code>です。16進数の桁の重みは右から1、16なので、<code>11 × 16 + 2 = 178</code>になります。</p>
-          <p class="small muted">先頭の0は値を変えません。ここでは8bitの位置を揃えるため、2進数を8桁、16進数を2桁で表示します。</p>
+          <p>2進数<code>10110010</code>は16進数<code>B2</code>です。16進数の重みは、右から左へ進むと16倍になり、右から1、16です。B（11）は重み16の桁にあるので、<code>11 × 16 + 2 × 1 = 178</code>になります。</p>
+          <p class="small muted">先頭の0は値を変えません。ここでは8bitの位置を揃えるため、2進数を8桁、16進数を2桁で表示します。試験では進数を区別するため、<code>(10110010)₂</code>、<code>B2h</code>、<code>0xB2</code>のように書くことがあります。</p>
         </section>
         <section id="lab" class="lesson-section" aria-labelledby="lab-title">
           <h2 id="lab-title"><span class="section-number">3.</span>触ってみる</h2>
-          <p>まず結果を予想してから、bitを切り替えてみてください。青いボタンの1は、その重みを合計に加えることを表します。</p>
+          <div class="example lab-goal"><h3>このLabで確かめること</h3><ul><li>1になっているbitの重みを足すと、値になること。</li><li>同じ値を、2進数・10進数・16進数で表せること。</li><li>10進数の値を、自分でbitに直せること。</li></ul><h4>進め方</h4><ol><li>右端のbitを切り替え、値がいくつ変わるかを見る（最初は本文の例と同じ178です）。</li><li>すべてのbitを1にして、最大値を確かめる。</li><li>すべてのbitを0にしてから、<strong>自分でbitを押して10進数の45を作る</strong>。大きい重みから、残りから引けるかどうかを考えます。</li><li>作れたら、入力欄で10進数の45を反映し、自分の答えと比べる。</li></ol></div>
           <noscript><div class="example"><h3>Labの例：178</h3><p class="formula">128 + 32 + 16 + 2 = 178</p><p>2進数：<code>10110010</code> / 10進数：178 / 16進数：<code>B2</code></p></div></noscript>
           <div class="lab" data-number-lab hidden>
             <h3>bitを切り替えて数を作ろう</h3>
-            <p class="small muted">ボタンを押すと0と1が切り替わります。キーボードではTabで移動し、EnterまたはSpaceで操作できます。</p>
-            <p class="prediction"><strong>予想してみよう：</strong>右端のbitを0から1にすると、値はいくつ増えるでしょうか？</p>
+            <p class="prediction"><strong>予想：</strong>右端のbitを0から1にすると、値はいくつ増えるでしょうか？<span class="small muted">（ボタンはTab・Enter・Spaceでも操作できます）</span></p>
             <div class="bit-groups" role="group" aria-label="8bitの値を切り替える">
               <div class="bit-group"><p class="bit-group-label">上位4bit（左側）</p><div class="bit-row">
                 <div class="bit-cell"><span class="bit-weight" aria-hidden="true">128</span><button type="button" class="bit-button" data-bit-weight="128" aria-label="重み128のbit" aria-pressed="true">1</button></div>
@@ -107,51 +130,54 @@
               <p class="lab-equation" data-equation>128 + 32 + 16 + 2 = 178</p>
               <dl class="number-results"><div><dt>2進数 · 8桁</dt><dd data-binary>10110010</dd></div><div><dt>10進数</dt><dd data-decimal>178</dd></div><div><dt>16進数 · 2桁</dt><dd data-hex>B2</dd></div></dl>
             </div>
-            <p class="lab-reason" data-lab-reason>1になっているbitの重みだけを足しています。</p>
+            <p class="lab-reason" data-lab-reason>最初は本文の例と同じ178です。1になっているbitの重みだけを足しています。</p>
             <p class="sr-only" data-lab-status role="status" aria-atomic="true"></p>
             <form novalidate aria-label="進数を選んで数を反映する">
               <div class="converter">
                 <div><label for="number-base">入力する進数</label><select id="number-base"><option value="10">10進数</option><option value="2">2進数</option><option value="16">16進数</option></select></div>
-                <div><label for="number-input">数値（0〜255）</label><input id="number-input" type="text" inputmode="numeric" value="178" autocomplete="off" spellcheck="false" aria-describedby="number-hint number-error"></div>
+                <div><label for="number-input" data-input-label>10進数の値（0〜255）</label><input id="number-input" type="text" inputmode="numeric" value="178" autocomplete="off" spellcheck="false" aria-describedby="number-hint number-error"></div>
                 <button type="submit" class="button">反映する</button>
               </div>
-              <p id="number-hint" class="small muted" data-input-hint>例：178。全角の数字・英字も使えます。</p>
+              <p id="number-hint" class="small muted" data-input-hint>例：178。全角の数字も使えます。</p>
               <p id="number-error" class="input-error error" data-input-error role="status"></p>
             </form>
             <button type="button" class="button secondary" data-lab-reset>例の178に戻す</button>
-            <div class="lab-tasks"><h4>次は、自分で確かめよう</h4><ol><li>右端のbitを切り替え、値の変化を確認する。</li><li>すべて1にして、最大値を確認する。</li><li>10進数の45を反映し、4bitずつ区切ると16進数の2Dになる理由を考える。</li></ol></div>
           </div>
         </section>
         <section id="exam" class="lesson-section" aria-labelledby="exam-title">
           <h2 id="exam-title"><span class="section-number">4.</span>試験ではこう問われる</h2>
           <p>変換表を丸暗記するより、桁の重みから計算できるようにしましょう。以下は、この教材で扱う基礎の確認ポイントです。</p>
-          <ul><li><strong>2進数 → 10進数：</strong>1の桁の重みを足す。</li><li><strong>10進数 → 2進数：</strong>大きい重みから使えるか判断する。45なら32、8、4、1を使う。</li><li><strong>2進数 ↔ 16進数：</strong>右から4bitずつ区切って読む。</li><li><strong>n bitの種類数：</strong>2ⁿ通り。符号なし整数の最大値は2ⁿ − 1。</li></ul>
+          <ul><li><strong>2進数 → 10進数：</strong>1の桁の重みを足す。</li><li><strong>10進数 → 2進数：</strong>大きい重みから順に、残りから引けるなら1、引けなければ0（「2. 仕組みを理解する」の手順）。</li><li><strong>2進数 ↔ 16進数：</strong>右から4bitずつ区切って読む。</li><li><strong>n bitの種類数：</strong>2ⁿ通り。符号なし整数の最大値は2ⁿ − 1。</li></ul>
           <div class="example"><h3>45を8bitで表す</h3><p class="formula">45 = 32 + 8 + 4 + 1</p><p>重み128と64は使わず0。32は使うので1。このように並べると、<code>00101101</code>になります。</p><p><code>0010</code>は2、<code>1101</code>は13（D）なので、16進数では<code>2D</code>です。</p></div>
           <p class="notice"><strong>よくある混同：</strong>8bitは256通りですが、最大値は255です。「何通り」と「最大でいくつ」を読み分けてください。</p>
-          <p class="small muted">この仕組みは、後のIPアドレスやサブネットの理解につながります。負数や小数の表現は、このページでは扱いません。</p>
+          <p class="small muted">この仕組みは、後のIPアドレスやサブネットの理解につながります。実際の試験では、この先の内容として、負の数の表し方（2の補数）、小数の2進数、シフト演算なども問われます。どれも、このページの「重み」の考え方が土台になります。</p>
         </section>
-        <section id="quiz" class="lesson-section" aria-labelledby="quiz-title" data-quiz data-quiz-version="1">
+        <section id="quiz" class="lesson-section" aria-labelledby="quiz-title" data-quiz data-quiz-version="2">
           <h2 id="quiz-title"><span class="section-number">5.</span>確認問題</h2>
-          <p>全4問です。答え合わせの後には理由が表示されます。間違えても、解説を読んでから再挑戦できます。</p>
-          <p class="small muted">教材用のオリジナル問題です。4問すべて回答すると、直近の成績を記録します。</p>
+          <p>全5問です。答え合わせの後には理由が表示されます。間違えても、解説を読んでから再挑戦できます。</p>
+          <p class="small muted">教材用のオリジナル問題です。5問すべて回答すると、直近の成績を記録します。</p>
           <p class="small muted" data-quiz-saved></p>
-          <form class="quiz-question" novalidate data-answer="45" data-explanation="32 + 8 + 4 + 1 = 45です。1になっている桁の重みだけを足します。">
-            <fieldset><legend>Q1. 2進数の00101101は、10進数ではいくつですか？</legend><label class="quiz-number-label" for="q1">10進数の値</label><input id="q1" name="answer" type="text" inputmode="numeric" autocomplete="off" aria-describedby="feedback-q1"></fieldset>
+          <form class="quiz-question" novalidate data-answer="108" data-explanation="64 + 32 + 8 + 4 = 108です。1になっている桁の重みだけを足します。">
+            <fieldset><legend>Q1. 2進数の01101100は、10進数ではいくつですか？</legend><label class="quiz-number-label" for="q1">10進数の値</label><input id="q1" name="answer" type="text" inputmode="numeric" autocomplete="off" aria-describedby="feedback-q1"></fieldset>
             <button type="submit" class="button secondary" hidden>答え合わせ</button><p id="feedback-q1" data-feedback class="quiz-feedback" role="status" hidden></p>
           </form>
-          <form class="quiz-question" novalidate data-answer="2D" data-explanation="45 = 2 × 16 + 13です。13を表す数字はDなので、16進数では2Dになります。">
-            <fieldset><legend>Q2. 10進数の45を16進数で表すと、どれですか？</legend><div class="quiz-options"><label><input type="radio" name="answer" value="2B" aria-describedby="feedback-q2"><span class="number">2B</span></label><label><input type="radio" name="answer" value="2D" aria-describedby="feedback-q2"><span class="number">2D</span></label><label><input type="radio" name="answer" value="D2" aria-describedby="feedback-q2"><span class="number">D2</span></label><label><input type="radio" name="answer" value="45" aria-describedby="feedback-q2"><span class="number">45</span></label></div></fieldset>
+          <form class="quiz-question" novalidate data-answer="C8" data-explanation="200 = 128 + 64 + 8なので、2進数では11001000です。4bitずつ区切ると1100（12＝C）と1000（8）なので、16進数ではC8です。">
+            <fieldset><legend>Q2. 10進数の200を16進数で表すと、どれですか？</legend><div class="quiz-options"><label><input type="radio" name="answer" value="8C" aria-describedby="feedback-q2"><span class="number">8C</span></label><label><input type="radio" name="answer" value="C8" aria-describedby="feedback-q2"><span class="number">C8</span></label><label><input type="radio" name="answer" value="C0" aria-describedby="feedback-q2"><span class="number">C0</span></label><label><input type="radio" name="answer" value="200" aria-describedby="feedback-q2"><span class="number">200</span></label></div></fieldset>
             <button type="submit" class="button secondary" hidden>答え合わせ</button><p id="feedback-q2" data-feedback class="quiz-feedback" role="status" hidden></p>
           </form>
-          <form class="quiz-question" novalidate data-answer="256-255" data-explanation="2⁸ = 256通りです。0を含むので、符号なし整数の最大値は256 − 1 = 255です。">
-            <fieldset><legend>Q3. 8bitの種類数と、符号なし整数の最大値の組合せは？</legend><div class="quiz-options"><label><input type="radio" name="answer" value="255-255" aria-describedby="feedback-q3"><span>255通り・最大値255</span></label><label><input type="radio" name="answer" value="256-256" aria-describedby="feedback-q3"><span>256通り・最大値256</span></label><label><input type="radio" name="answer" value="256-255" aria-describedby="feedback-q3"><span>256通り・最大値255</span></label><label><input type="radio" name="answer" value="8-7" aria-describedby="feedback-q3"><span>8通り・最大値7</span></label></div></fieldset>
+          <form class="quiz-question" novalidate data-answer="16-65536" data-explanation="1byte＝8bitなので、2byteは16bitです。16bitの組合せは2¹⁶ = 65,536通りです。">
+            <fieldset><legend>Q3. 2byteは何bitで、何通りの値を表せますか？</legend><div class="quiz-options"><label><input type="radio" name="answer" value="16-256" aria-describedby="feedback-q3"><span>16bit・256通り</span></label><label><input type="radio" name="answer" value="16-65536" aria-describedby="feedback-q3"><span>16bit・65,536通り</span></label><label><input type="radio" name="answer" value="2-4" aria-describedby="feedback-q3"><span>2bit・4通り</span></label><label><input type="radio" name="answer" value="8-256" aria-describedby="feedback-q3"><span>8bit・256通り</span></label></div></fieldset>
             <button type="submit" class="button secondary" hidden>答え合わせ</button><p id="feedback-q3" data-feedback class="quiz-feedback" role="status" hidden></p>
           </form>
-          <form class="quiz-question" novalidate data-answer="14" data-explanation="00001111は15です。右端のbitの重みは1なので、0にすると15 − 1 = 14になります。">
-            <fieldset><legend>Q4. 00001111の右端のbitを0にすると、10進数の値はいくつですか？</legend><label class="quiz-number-label" for="q4">変更後の10進数の値</label><input id="q4" name="answer" type="text" inputmode="numeric" autocomplete="off" aria-describedby="feedback-q4"></fieldset>
+          <form class="quiz-question" novalidate data-answer="16-15" data-explanation="2⁴ = 16通りです。0から数えるので、最大値は16 − 1 = 15（2進数で1111、16進数でF）です。">
+            <fieldset><legend>Q4. 4bitで表せる種類数と、符号なし整数の最大値の組合せは？</legend><div class="quiz-options"><label><input type="radio" name="answer" value="15-15" aria-describedby="feedback-q4"><span>15通り・最大値15</span></label><label><input type="radio" name="answer" value="16-16" aria-describedby="feedback-q4"><span>16通り・最大値16</span></label><label><input type="radio" name="answer" value="16-15" aria-describedby="feedback-q4"><span>16通り・最大値15</span></label><label><input type="radio" name="answer" value="4-3" aria-describedby="feedback-q4"><span>4通り・最大値3</span></label></div></fieldset>
             <button type="submit" class="button secondary" hidden>答え合わせ</button><p id="feedback-q4" data-feedback class="quiz-feedback" role="status" hidden></p>
           </form>
-          <p class="quiz-summary" data-quiz-summary role="status">0 / 4問回答</p>
+          <form class="quiz-question" novalidate data-answer="14" data-explanation="00001111は15です。右端のbitの重みは1なので、0にすると15 − 1 = 14になります。">
+            <fieldset><legend>Q5. 00001111の右端のbitを0にすると、10進数の値はいくつですか？</legend><label class="quiz-number-label" for="q5">変更後の10進数の値</label><input id="q5" name="answer" type="text" inputmode="numeric" autocomplete="off" aria-describedby="feedback-q5"></fieldset>
+            <button type="submit" class="button secondary" hidden>答え合わせ</button><p id="feedback-q5" data-feedback class="quiz-feedback" role="status" hidden></p>
+          </form>
+          <p class="quiz-summary" data-quiz-summary role="status">0 / 5問回答</p>
           <button type="button" class="button secondary" data-quiz-reset hidden>もう一度挑戦する</button>
         </section>
         <section id="complete" class="lesson-section" aria-labelledby="complete-title">
