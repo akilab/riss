@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="小数点の右のbitで0.1を作り、2進数の小数・浮動小数点数・計算の誤差を学ぶ発展教材。">
+  <title>Extra 01 浮動小数点数 | 科目A-1 技術基礎</title>
+  <script src="../js/theme.js"></script>
+  <link rel="stylesheet" href="../css/common.css">
+  <link rel="stylesheet" href="../css/lesson.css">
+  <link rel="stylesheet" href="../css/lab.css">
+  <link rel="stylesheet" href="../css/floating-point.css">
+  <script src="../js/curriculum.js" defer></script>
+  <script src="../js/progress.js" defer></script>
+  <script src="../js/common.js" defer></script>
+  <script src="../js/quiz.js" defer></script>
+  <script src="../js/labs/floating-point.js" defer></script>
+</head>
+<body data-lesson-id="30">
+  <a class="skip-link" href="#main">本文へ移動</a>
+  <header class="site-header"><div class="container header-inner"><a class="brand" href="../index.html">支援士学習<span>情報処理安全確保支援士 · 科目A-1</span></a><div class="header-actions"><a class="header-link" href="../index.html#curriculum">教材一覧</a><button type="button" class="button secondary theme-toggle" data-theme-toggle aria-label="ダークモード" aria-pressed="false" hidden>ダークモード：オフ</button></div></div></header>
+  <main id="main" class="container" tabindex="-1">
+    <p class="notice storage-notice" data-storage-notice role="status" hidden></p>
+    <p class="notice theme-notice" data-theme-notice role="status" hidden></p>
+    <noscript><p class="notice">JavaScriptが無効です。本文と例は読めますが、Lab・答え合わせ・進捗保存にはJavaScriptを有効にしてください。</p></noscript>
+    <nav class="breadcrumb" aria-label="パンくず"><a href="../index.html">全体目次</a> / <a href="../index.html#chapter-11">Extra</a> / <span aria-current="page">浮動小数点数</span></nav>
+    <header class="lesson-heading">
+      <span class="status" data-lesson-status="30">未学習</span>
+      <h1>Extra 01　浮動小数点数</h1>
+      <p>コンピュータで0.1 + 0.2を計算すると、0.3になりません。小数点の右のbitで0.1を作って、理由を確かめましょう。</p>
+      <div class="lesson-meta"><span>学習時間：25〜35分</span><span>前提知識：Lesson 01の「重み」</span><span>範囲：2進数の小数・浮動小数点数・計算の誤差</span></div>
+    </header>
+    <div class="lesson-layout">
+      <nav class="lesson-toc" aria-label="ページ内目次">
+        <h2>このページの内容</h2>
+        <ol><li><a href="#image">まずイメージを掴む</a></li><li><a href="#mechanism">仕組みを理解する</a></li><li><a href="#lab">触ってみる</a></li><li><a href="#exam">試験ではこう問われる</a></li><li><a href="#quiz">確認問題</a></li><li><a href="#complete">学習を振り返る</a></li></ol>
+      </nav>
+      <article class="lesson-body" aria-label="浮動小数点数の教材">
+        <p class="notice">本編より難しい発展内容（Extra）です。<a href="01-number-bit.html">Lesson 01　進数・bit</a>で「重み」を学んでから取り組んでください。</p>
+        <section class="objectives" aria-labelledby="objectives-title">
+          <h2 id="objectives-title">このページで学ぶこと</h2>
+          <ul><li>2進数の小数を、小数点の右の重み（1/2、1/4、1/8…）の合計として読める。</li><li>10進数の0.1が、2進数では割り切れない理由を説明できる。</li><li>浮動小数点数が、数を「数字の並び（仮数）」と「小数点の位置（指数）」に分けて持つ理由を説明できる。</li><li>2進数の正規化で、先頭が必ず「1.」になり、その1を保存しない理由を説明できる。</li><li>丸め誤差・情報落ち・桁落ちを、例で区別できる。</li></ul>
+        </section>
+        <section id="image" class="lesson-section" aria-labelledby="image-title">
+          <h2 id="image-title"><span class="section-number">1.</span>まずイメージを掴む</h2>
+          <div class="example">
+            <h3>0.1 + 0.2 は、0.3にならない</h3>
+            <p>多くのプログラミング言語で<code>0.1 + 0.2</code>を計算すると、結果は<code>0.30000000000000004</code>になります。計算の間違いではなく、コンピュータが小数を2進数で持つために起きる<strong>誤差</strong>です。</p>
+            <p>金額の計算でこの誤差が積み重なると、合計が1円ずれるといった不具合になります。そのため、お金は「円」や「セント」単位の整数で計算するのが基本です。</p>
+          </div>
+          <p>10進数でも、1 ÷ 3 = 0.333…のように<strong>割り切れない数</strong>があります。どこかの桁で止めると、本当の値との差（誤差）が残ります。</p>
+          <p>2進数でも同じことが起きます。しかも、10進数ではきれいな<strong>0.1が、2進数では割り切れません</strong>。このページでは、その理由と、コンピュータが小数をどう持っているかを見ていきます。</p>
+          <div class="example">
+            <h3>桁の多い数は「×10の何乗」で書く</h3>
+            <p>光の速さは約<code>300,000,000</code>m/秒、1ナノ秒は<code>0.000000001</code>秒です。0を並べると読みにくいので、<code>3.0 × 10⁸</code>、<code>1.0 × 10⁻⁹</code>と書きます（10⁻⁹は「10で9回割る」の意味です）。</p>
+            <p>小数点の位置を「10の何乗」で表すと、とても大きい数も小さい数も、少ない桁で書けます。この書き方を2進数で行うのが、<strong>浮動小数点数</strong>です。「浮動」は、小数点の位置が動くという意味です。</p>
+          </div>
+        </section>
+        <section id="mechanism" class="lesson-section" aria-labelledby="mechanism-title">
+          <h2 id="mechanism-title"><span class="section-number">2.</span>仕組みを理解する</h2>
+          <h3>小数点の右の重みは、1/2、1/4、1/8…</h3>
+          <p>Lesson 01では、2進数の重みが右から左へ1、2、4、8…と2倍になることを学びました。逆に、左から右へ進むと重みは<strong>半分</strong>になります。小数点を越えて右へ進んでも、同じように半分になり続けます。</p>
+          <div class="example">
+            <div class="place-values"><div class="place-value">一の位<strong>1</strong>重み1</div><div class="place-value">小数第1位<strong>1</strong>重み1/2</div><div class="place-value">小数第2位<strong>0</strong>重み1/4</div><div class="place-value">小数第3位<strong>1</strong>重み1/8</div></div>
+            <p class="formula">1.101₂ = 1 + 0.5 + 0.125 = 1.625</p>
+            <p>整数のときと同じく、1の桁の重みを足します。この教材では、2進数であることを<code>₂</code>で示します。</p>
+          </div>
+          <table class="reference-table">
+            <caption>小数点の右の重み</caption>
+            <thead><tr><th scope="col">桁</th><th scope="col">重み（分数）</th><th scope="col">重み（10進数の小数）</th></tr></thead>
+            <tbody><tr><td>小数第1位</td><td class="number">1/2</td><td class="number">0.5</td></tr><tr><td>小数第2位</td><td class="number">1/4</td><td class="number">0.25</td></tr><tr><td>小数第3位</td><td class="number">1/8</td><td class="number">0.125</td></tr><tr><td>小数第4位</td><td class="number">1/16</td><td class="number">0.0625</td></tr><tr><td>小数第5位</td><td class="number">1/32</td><td class="number">0.03125</td></tr><tr><td>小数第6位</td><td class="number">1/64</td><td class="number">0.015625</td></tr><tr><td>小数第7位</td><td class="number">1/128</td><td class="number">0.0078125</td></tr><tr><td>小数第8位</td><td class="number">1/256</td><td class="number">0.00390625</td></tr></tbody>
+          </table>
+          <h3>0.1を2進数に直すと、終わらない</h3>
+          <p>10進数の小数を2進数に直すときも、Lesson 01と同じく<strong>大きい重みから順に、残りから引けるかどうか</strong>を見ます。0.1で試してみましょう。</p>
+          <div class="table-scroll" tabindex="0" role="region" aria-label="0.1を2進数に直す表。狭い画面では横スクロールできます。"><table class="reference-table">
+            <caption>10進数の0.1を、小数点の右8桁まで2進数に直す</caption>
+            <thead><tr><th scope="col">重み</th><th scope="col">残りから引ける？</th><th scope="col">bit</th><th scope="col">引いた後の残り</th></tr></thead>
+            <tbody><tr><td class="number">0.5</td><td>0.1から0.5は引けない</td><td class="number">0</td><td class="number">0.1</td></tr><tr><td class="number">0.25</td><td>引けない</td><td class="number">0</td><td class="number">0.1</td></tr><tr><td class="number">0.125</td><td>引けない</td><td class="number">0</td><td class="number">0.1</td></tr><tr><td class="number">0.0625</td><td>0.1 − 0.0625</td><td class="number">1</td><td class="number">0.0375</td></tr><tr><td class="number">0.03125</td><td>0.0375 − 0.03125</td><td class="number">1</td><td class="number">0.00625</td></tr><tr><td class="number">0.015625</td><td>引けない</td><td class="number">0</td><td class="number">0.00625</td></tr><tr><td class="number">0.0078125</td><td>引けない</td><td class="number">0</td><td class="number">0.00625</td></tr><tr><td class="number">0.00390625</td><td>0.00625 − 0.00390625</td><td class="number">1</td><td class="number">0.00234375</td></tr></tbody>
+          </table></div>
+          <p>8桁目まで進めても、残りは0になりません。続けると<code>0.0001100110011…₂</code>のように、<strong>「0011」が永遠に繰り返されます</strong>。10進数の1/3 = 0.333…と同じで、どこかで止めるしかありません。</p>
+          <div class="example">
+            <h3>別の求め方：2倍して、整数部分を取り出す</h3>
+            <p>試験では、小数を<strong>2倍して、1以上なら1、1未満なら0</strong>を並べる方法もよく使います。1以上になったら1を引いて続けます。</p>
+            <p class="formula">0.1→0.2（0）→0.4（0）→0.8（0）→1.6（1）→1.2（1）→0.4（0）…</p>
+            <p>最後の0.4は、2つ目の0.4と同じ数です。ここから先は同じ計算の繰り返しになるので、2進数の小数も繰り返しになります。</p>
+          </div>
+          <p class="notice"><strong>2進数で割り切れる小数の見分け方：</strong>分母が2、4、8、16…（2の累乗）の分数で表せる小数だけが、2進数で割り切れます。0.5（1/2）、0.375（3/8）、0.625（5/8）は割り切れます。0.1（1/10）、0.2（1/5）、0.3（3/10）は、分母に5が残るので割り切れません。</p>
+          <h3>固定小数点数の困りごと：席の分け方を先に決めてしまう</h3>
+          <p>Labのように「小数点の右に8bit」と、小数点の位置を最初から決めておく方法を<strong>固定小数点数</strong>と呼びます。仕組みは単純ですが、<strong>整数部分の席と小数部分の席を、先に分けてしまう</strong>のが弱点です。</p>
+          <div class="example">
+            <h3>32bitを「左16bit・右16bit」に分けた場合</h3>
+            <ul><li>整数部分は16bitなので、表せるのは65,535まで。光の速さ（約3億）は入りません。</li><li>小数部分は16bitなので、刻みは1/65,536（約0.000015）。1ナノ秒（0.000000001）は0になってしまいます。</li></ul>
+            <p>左の席を増やせば大きい数は入りますが、右の席が減って細かい数が入らなくなります。どちらかを我慢するしかありません。</p>
+          </div>
+          <h3>発想：「数字の並び」と「小数点の位置」を分けて覚える</h3>
+          <p>「1. まずイメージを掴む」の<code>3.0 × 10⁸</code>を思い出してください。この書き方は、数を次の2つに分けて覚えています。</p>
+          <ul><li><strong>数字の並び：</strong><code>3.0</code></li><li><strong>小数点の位置：</strong><code>× 10⁸</code>（小数点を右へ8つ動かす）</li></ul>
+          <p>24.675なら、並びは「24675」、小数点は「先頭から2桁目の後ろ」なので<code>2.4675 × 10¹</code>です。ここで大事なのは、<strong>「24」と「675」を別々に覚えていない</strong>ことです。整数部分も小数部分も、1本の数字の並びにつなげています。</p>
+          <p>浮動小数点数は、これを2進数で行います。24.675で手順を見てみましょう。</p>
+          <ol><li>整数部分と小数部分を、それぞれ2進数に直す：24 → <code>11000₂</code>、0.675 → <code>0.10101100110011…₂</code>（0.1と同じく割り切れません）。</li><li>小数点をはさんで1本につなげる：<code>11000.10101100110011…₂</code></li><li>「数字の並び」と「小数点の位置」に分けて覚える：<code>1.100010101100110011…₂ × 2⁴</code></li></ol>
+          <p>数字の並びの部分を<strong>仮数</strong>、小数点の位置（2の何乗か）を<strong>指数</strong>と呼びます。これに正・負を表す<strong>符号</strong>を加えた3つで、1つの数を表します。指数を変えれば小数点の位置が動くので、とても大きい数もとても小さい数も、同じbit数で表せます。</p>
+          <h3>なぜ「1.xxx」の形にそろえるのか：正規化</h3>
+          <p>実は、小数点の位置の書き方は1通りではありません。24.675は、次のどれでも同じ値です。</p>
+          <p class="formula">11000.1010…₂ × 2⁰ = 1.10001010…₂ × 2⁴ = 0.110001010…₂ × 2⁵ = 0.0110001010…₂ × 2⁶</p>
+          <p>書き方がばらばらだと、2つの数を比べたり足したりするたびに、そろえ直す手間がかかります。また<code>0.0110…</code>のように先頭に0を並べると、限られた仮数の席を、意味のない0で使ってしまいます。</p>
+          <p>そこで、<strong>最初に出てくる1のすぐ後ろに小数点を置く</strong>と決めます。こうすると、どの数も書き方が1通りになり、先頭の0で席を無駄にしません。このようにそろえることを<strong>正規化</strong>と呼びます。</p>
+          <div class="example">
+            <h3>5.75と0.375を正規化する</h3>
+            <p class="formula">5.75 = 4 + 1 + 0.5 + 0.25 = 101.11₂ = 1.0111₂ × 2²</p>
+            <p>小数点を左へ2つ動かすと、先頭が「1.」になります。動かした数の2が指数です。</p>
+            <p class="formula">0.375 = 0.25 + 0.125 = 0.011₂ = 1.1₂ × 2⁻²</p>
+            <p>1より小さい数では、小数点を右へ動かすので、指数がマイナスになります。</p>
+          </div>
+          <p>10進数の正規化（<code>2.4675 × 10¹</code>）では、先頭の数字は1〜9のどれかです。ところが2進数で使う数字は0と1だけなので、最初に出てくる0以外の数字は<strong>必ず1</strong>です。だから2進数の浮動小数点数は、どの数でも「1.xxx」の形になります。「1.xxx」は値が1くらいという意味ではなく、24.675も1000000も同じ形になります。</p>
+          <p class="small muted">試験では、最初の1を小数点の右に置く「0.1xxx」の形が問題文で定義されることもあります。最初の1を決まった位置にそろえる考え方は同じで、置き場所の約束が違うだけです。形式の説明を読んで、そのとおりに当てはめてください。</p>
+          <h3>必ず1なら、保存しなくてよい</h3>
+          <p>正規化した数の先頭は、必ず1です。必ず1だと分かっているものを毎回保存するのは、席の無駄です。そこで<strong>「1.」より後ろだけを仮数部に入れ</strong>、読み出すときに1を補います。省いた1bitの分、ほかの数字を1bit多く入れられます。</p>
+          <h3>IEEE 754の単精度：32bitの割り当て</h3>
+          <p>多くのコンピュータは、<strong>IEEE 754</strong>という国際標準の形式を使います。32bitの<strong>単精度</strong>では、ここまでの考え方を次のように割り当てます。</p>
+          <div class="table-scroll" tabindex="0" role="region" aria-label="単精度浮動小数点数の構成の表。狭い画面では横スクロールできます。"><table class="reference-table">
+            <caption>単精度（32bit）の構成と、5.75を表した例</caption>
+            <thead><tr><th scope="col">部分</th><th scope="col">bit数</th><th scope="col">入れるもの</th><th scope="col">5.75の場合</th></tr></thead>
+            <tbody><tr><td>符号部</td><td class="number">1</td><td>正なら0、負なら1</td><td class="number">0</td></tr><tr><td>指数部</td><td class="number">8</td><td>指数に127を足した値</td><td class="number">2 + 127 = 129 → 10000001</td></tr><tr><td>仮数部</td><td class="number">23</td><td>正規化した「1.xxx」の、小数点より右（先頭の1は保存しない）</td><td class="number">0111 0000…（残りは0）</td></tr></tbody>
+          </table></div>
+          <p>指数に127を足すのは、0.375の<code>2⁻²</code>のように<strong>指数がマイナスになることがある</strong>からです。127を足してから保存すると、−2は125になり、マイナスの指数も0以上の数として8bitに入れられます。読み出すときは127を引いて戻します。</p>
+          <h3>整数部分と小数部分は、仮数部の席を分け合う</h3>
+          <p>仮数部には、整数部分と小数部分をつなげた並びが入ります。固定小数点数のように席が分かれていないので、<strong>整数部分が長いほど、小数部分に残る席が減ります</strong>。24.675の仮数部の中身を分けてみましょう。</p>
+          <div class="table-scroll" tabindex="0" role="region" aria-label="24.675の仮数部の内訳の表。狭い画面では横スクロールできます。"><table class="reference-table">
+            <caption>24.675（= 1.100010101100110011…₂ × 2⁴）の仮数部23bitの内訳</caption>
+            <thead><tr><th scope="col">先頭の1</th><th scope="col">24の残り</th><th scope="col">0.675の部分</th></tr></thead>
+            <tbody><tr><td>保存しない</td><td class="number">1000（4bit）</td><td class="number">1010110011001100110（19bit）</td></tr></tbody>
+          </table></div>
+          <div class="table-scroll" tabindex="0" role="region" aria-label="整数部分の大きさと小数部分に残る席の表。狭い画面では横スクロールできます。"><table class="reference-table">
+            <caption>整数部分の大きさと、小数部分に残る席（単精度）</caption>
+            <thead><tr><th scope="col">値</th><th scope="col">整数部分が使う席</th><th scope="col">小数部分に残る席</th><th scope="col">実際に保存される値</th></tr></thead>
+            <tbody><tr><td class="number">24.675</td><td>4bit</td><td>19bit</td><td class="number">24.674999237…</td></tr><tr><td class="number">1000000.675</td><td>19bit</td><td>4bit（1/16刻み）</td><td class="number">1000000.6875</td></tr></tbody>
+          </table></div>
+          <p>100万を超えると、小数部分は0.0625刻みでしか表せず、0.675は一番近い0.6875に<strong>丸め</strong>られます（表せる中で近い値にそろえること）。小さい数は細かく、大きい数は粗く表す。これが浮動小数点数の性質で、正確な桁数の目安は10進数で約7桁です。64bitの<strong>倍精度</strong>（符号部1bit・指数部11bit・仮数部52bit）では、約15〜16桁になります。</p>
+          <h3>計算で生じる誤差の種類</h3>
+          <p>仮数の席に限りがあり、大きい数ほど細かい桁が入らないため、計算のしかたによって誤差が目立つことがあります。分かりやすくするため、ここでは<strong>10進数で有効数字4桁</strong>（仮数を4桁まで持てる）のコンピュータを考えます。</p>
+          <div class="table-scroll" tabindex="0" role="region" aria-label="誤差の種類の表。狭い画面では横スクロールできます。"><table class="reference-table error-table">
+            <caption>誤差の種類（有効数字4桁で考える）</caption>
+            <thead><tr><th scope="col">名前</th><th scope="col">起きる場面</th><th scope="col">例</th></tr></thead>
+            <tbody><tr><th scope="row">丸め誤差</th><td>表せる桁に収めるため、切り捨て・切り上げ・四捨五入をする</td><td>1 ÷ 3 = 0.3333…を、0.3333として持つ</td></tr><tr><th scope="row">情報落ち</th><td>絶対値の大きい数と小さい数を足し引きすると、小さい数が結果に反映されない</td><td>10000 + 0.1 = 10000.1だが、4桁では1.000 × 10⁴（10000）のまま</td></tr><tr><th scope="row">桁落ち</th><td>値の近い数どうしを引くと、有効な数字の桁が大きく減る</td><td>1.2346を丸めた1.235と、1.2344を丸めた1.234を引くと0.001。本当の差0.0002の5倍になる</td></tr><tr><th scope="row">桁あふれ</th><td>計算結果が、指数部で表せる範囲を超える</td><td>大きすぎる：オーバーフロー。0に近すぎる：アンダーフロー</td></tr><tr><th scope="row">打切り誤差</th><td>終わらない計算を、決めた回数で打ち切る</td><td>円周率を、足し算の繰り返しで100回分だけ計算して止める</td></tr></tbody>
+          </table></div>
+          <p>情報落ちは、たくさんの数を足すときに<strong>絶対値の小さい数から順に足す</strong>と減らせます。小さい数どうしを先にまとめると、大きい数に足したときに消えにくくなるからです。</p>
+        </section>
+        <section id="lab" class="lesson-section" aria-labelledby="lab-title">
+          <h2 id="lab-title"><span class="section-number">3.</span>触ってみる</h2>
+          <div class="example lab-goal"><h3>このLabで確かめること</h3><ul><li>小数点の右の重みが、1/2、1/4…と半分ずつ小さくなること。</li><li>0.1は、bitをどう組み合わせても<strong>ぴったりにならない</strong>こと。</li><li>使うbit数を増やすと、0.1との差（誤差）を小さくできること。</li></ul><p class="small muted">このLabは、小数点の位置を決めた固定小数点数です。浮動小数点数の仮数部でも、同じように桁数が限られます。</p><h4>進め方</h4><ol><li>最初は本文の例に近い<code>0.101₂</code>（0.625）です。左端のbitを切り替え、値がいくつ変わるかを見る。</li><li>「4bit」を選び、<strong>自分でbitを押して0.1に一番近い並びを探す</strong>。「0.1との差」が小さくなる組合せを考えます。</li><li>見つけたら「一番近い並びを見る」で答え合わせをする。</li><li>「8bit」に切り替えて同じように探し、4bitのときと差を比べる。</li></ol></div>
+          <noscript><div class="example"><h3>Labの例：8bitで0.1に一番近い並び</h3><p class="formula">0.00011010₂ = 0.0625 + 0.03125 + 0.0078125 = 0.1015625</p><p>0.1との差は0.0015625です。8bitでは、これより0.1に近い並びはありません。</p></div></noscript>
+          <div class="lab" data-fraction-lab hidden>
+            <h3>小数点の右のbitで0.1を作ろう</h3>
+            <p class="prediction"><strong>予想：</strong>小数点の右に8bitあれば、0.1をぴったり作れるでしょうか？<span class="small muted">（ボタンはTab・Enter・Spaceでも操作できます）</span></p>
+            <div class="fraction-width" role="group" aria-labelledby="fraction-width-label"><span id="fraction-width-label">小数点の右に使うbit数</span><button type="button" class="button secondary signal-toggle" data-width="4" aria-pressed="false">4bit</button><button type="button" class="button secondary signal-toggle" data-width="8" aria-pressed="true">8bit</button></div>
+            <div class="bit-groups" role="group" aria-label="小数点の右の8bitを切り替える">
+              <div class="bit-group"><p class="bit-group-label">小数第1〜4位</p><div class="bit-row">
+                <div class="bit-cell"><span class="bit-weight" aria-hidden="true">1/2<span class="weight-decimal">0.5</span></span><button type="button" class="bit-button" data-bit-place="1" aria-label="小数第1位（重み1/2）のbit" aria-pressed="true">1</button></div>
+                <div class="bit-cell"><span class="bit-weight" aria-hidden="true">1/4<span class="weight-decimal">0.25</span></span><button type="button" class="bit-button" data-bit-place="2" aria-label="小数第2位（重み1/4）のbit" aria-pressed="false">0</button></div>
+                <div class="bit-cell"><span class="bit-weight" aria-hidden="true">1/8<span class="weight-decimal">0.125</span></span><button type="button" class="bit-button" data-bit-place="3" aria-label="小数第3位（重み1/8）のbit" aria-pressed="true">1</button></div>
+                <div class="bit-cell"><span class="bit-weight" aria-hidden="true">1/16<span class="weight-decimal">0.0625</span></span><button type="button" class="bit-button" data-bit-place="4" aria-label="小数第4位（重み1/16）のbit" aria-pressed="false">0</button></div>
+              </div></div>
+              <div class="bit-group" data-lower-group><p class="bit-group-label" data-lower-label>小数第5〜8位</p><div class="bit-row">
+                <div class="bit-cell"><span class="bit-weight" aria-hidden="true">1/32<span class="weight-decimal">0.03125</span></span><button type="button" class="bit-button" data-bit-place="5" aria-label="小数第5位（重み1/32）のbit" aria-pressed="false">0</button></div>
+                <div class="bit-cell"><span class="bit-weight" aria-hidden="true">1/64<span class="weight-decimal">0.015625</span></span><button type="button" class="bit-button" data-bit-place="6" aria-label="小数第6位（重み1/64）のbit" aria-pressed="false">0</button></div>
+                <div class="bit-cell"><span class="bit-weight" aria-hidden="true">1/128<span class="weight-decimal">0.0078125</span></span><button type="button" class="bit-button" data-bit-place="7" aria-label="小数第7位（重み1/128）のbit" aria-pressed="false">0</button></div>
+                <div class="bit-cell"><span class="bit-weight" aria-hidden="true">1/256<span class="weight-decimal">0.00390625</span></span><button type="button" class="bit-button" data-bit-place="8" aria-label="小数第8位（重み1/256）のbit" aria-pressed="false">0</button></div>
+              </div></div>
+            </div>
+            <div class="lab-result">
+              <p class="small muted">1になっているbitの重みの合計</p>
+              <p class="lab-equation" data-equation>0.5 + 0.125 = 0.625</p>
+              <dl class="number-results"><div><dt data-binary-label>2進数 · 小数点の右8桁</dt><dd data-binary>0.10100000</dd></div><div><dt>10進数</dt><dd data-decimal>0.625</dd></div><div><dt>0.1との差</dt><dd data-difference>0.525</dd></div></dl>
+            </div>
+            <p class="lab-reason" data-lab-reason>最初の例です。0.10100000₂（0.625）は0.1より大きい値で、差は0.525です。</p>
+            <p class="sr-only" data-lab-status role="status" aria-atomic="true"></p>
+            <div class="lab-actions"><button type="button" class="button" data-lab-nearest>一番近い並びを見る</button><button type="button" class="button secondary" data-lab-reset>例の0.625に戻す</button></div>
+          </div>
+        </section>
+        <section id="exam" class="lesson-section" aria-labelledby="exam-title">
+          <h2 id="exam-title"><span class="section-number">4.</span>試験ではこう問われる</h2>
+          <p>暗記よりも、重みと正規化の手順から考えられるようにしましょう。以下は、この教材で扱う確認ポイントです。</p>
+          <ul><li><strong>2進数の小数 → 10進数：</strong>小数点の右の重み（0.5、0.25、0.125…）を足す。</li><li><strong>2進数で割り切れるか：</strong>分母が2の累乗の分数になるか。0.1・0.2・0.3などは割り切れず、誤差が出る。</li><li><strong>正規化：</strong>最初の1の位置に小数点をそろえ、「1.xxx × 2の何乗」にする。問題文で別の形式（0.1xxxなど）が定義されたら、それに従う。</li><li><strong>誤差の名前：</strong>場面（大と小の足し算、近い値の引き算など）から選ぶ。</li></ul>
+          <div class="example"><h3>0.375を2進数で表す</h3><p class="formula">0.375 = 0.25 + 0.125</p><p>重み0.5は使わず0。0.25と0.125は使うので1。並べると<code>0.011₂</code>です。2倍する方法でも、0.75（0）→1.5（1）→1.0（1）で残りが0になり、割り切れます。</p></div>
+          <p class="notice"><strong>よくある混同：</strong>「情報落ち」は大きい数と小さい数の<strong>足し算・引き算で、小さいほうが消える</strong>こと。「桁落ち」は値の近い数の<strong>引き算で、有効な桁が減る</strong>ことです。</p>
+        </section>
+        <section id="quiz" class="lesson-section" aria-labelledby="quiz-title" data-quiz data-quiz-version="1">
+          <h2 id="quiz-title"><span class="section-number">5.</span>確認問題</h2>
+          <p>全5問です。答え合わせの後には理由が表示されます。間違えても、解説を読んでから再挑戦できます。</p>
+          <p class="small muted">教材用のオリジナル問題です。5問すべて回答すると、直近の成績を記録します。</p>
+          <p class="small muted" data-quiz-saved></p>
+          <form class="quiz-question" novalidate data-answer="0.75" data-explanation="小数第1位の重みは0.5、小数第2位の重みは0.25です。0.5 + 0.25 = 0.75です。">
+            <fieldset><legend>Q1. 2進数の0.11は、10進数ではいくつですか？</legend><div class="quiz-options"><label><input type="radio" name="answer" value="0.11" aria-describedby="feedback-q1"><span class="number">0.11</span></label><label><input type="radio" name="answer" value="0.3" aria-describedby="feedback-q1"><span class="number">0.3</span></label><label><input type="radio" name="answer" value="0.75" aria-describedby="feedback-q1"><span class="number">0.75</span></label><label><input type="radio" name="answer" value="3" aria-describedby="feedback-q1"><span class="number">3</span></label></div></fieldset>
+            <button type="submit" class="button secondary" hidden>答え合わせ</button><p id="feedback-q1" data-feedback class="quiz-feedback" role="status" hidden></p>
+          </form>
+          <form class="quiz-question" novalidate data-answer="0.375" data-explanation="0.375 = 3/8で、分母が2の累乗です。0.25 + 0.125なので、2進数では0.011と割り切れます。0.1・0.2・0.6は分母に5が残り、割り切れません。">
+            <fieldset><legend>Q2. 10進数の小数のうち、2進数で有限の桁数で表せる（割り切れる）のはどれですか？</legend><div class="quiz-options"><label><input type="radio" name="answer" value="0.1" aria-describedby="feedback-q2"><span class="number">0.1</span></label><label><input type="radio" name="answer" value="0.2" aria-describedby="feedback-q2"><span class="number">0.2</span></label><label><input type="radio" name="answer" value="0.375" aria-describedby="feedback-q2"><span class="number">0.375</span></label><label><input type="radio" name="answer" value="0.6" aria-describedby="feedback-q2"><span class="number">0.6</span></label></div></fieldset>
+            <button type="submit" class="button secondary" hidden>答え合わせ</button><p id="feedback-q2" data-feedback class="quiz-feedback" role="status" hidden></p>
+          </form>
+          <form class="quiz-question" novalidate data-answer="5.75" data-explanation="× 2²は、小数点を右へ2つ動かすことです。1.0111₂は101.11₂になり、4 + 1 + 0.5 + 0.25 = 5.75です。">
+            <fieldset><legend>Q3. 正規化された 1.0111₂ × 2² は、10進数ではいくつですか？</legend><div class="quiz-options"><label><input type="radio" name="answer" value="1.4375" aria-describedby="feedback-q3"><span class="number">1.4375</span></label><label><input type="radio" name="answer" value="4.75" aria-describedby="feedback-q3"><span class="number">4.75</span></label><label><input type="radio" name="answer" value="5.75" aria-describedby="feedback-q3"><span class="number">5.75</span></label><label><input type="radio" name="answer" value="23" aria-describedby="feedback-q3"><span class="number">23</span></label></div></fieldset>
+            <button type="submit" class="button secondary" hidden>答え合わせ</button><p id="feedback-q3" data-feedback class="quiz-feedback" role="status" hidden></p>
+          </form>
+          <form class="quiz-question" novalidate data-answer="information" data-explanation="絶対値の大きい数に小さい数を足すと、仮数の桁に収まらず、小さい数が結果に反映されません。これが情報落ちです。小さい数から順に足すと減らせます。">
+            <fieldset><legend>Q4. 絶対値の大きく異なる2つの数を足したとき、小さいほうの数が結果に反映されない誤差はどれですか？</legend><div class="quiz-options"><label><input type="radio" name="answer" value="cancellation" aria-describedby="feedback-q4"><span>桁落ち</span></label><label><input type="radio" name="answer" value="information" aria-describedby="feedback-q4"><span>情報落ち</span></label><label><input type="radio" name="answer" value="overflow" aria-describedby="feedback-q4"><span>オーバーフロー</span></label><label><input type="radio" name="answer" value="truncation" aria-describedby="feedback-q4"><span>打切り誤差</span></label></div></fieldset>
+            <button type="submit" class="button secondary" hidden>答え合わせ</button><p id="feedback-q4" data-feedback class="quiz-feedback" role="status" hidden></p>
+          </form>
+          <form class="quiz-question" novalidate data-answer="cancellation" data-explanation="値の近い数どうしを引くと、上の桁が打ち消し合い、有効な数字の桁が大きく減ります。これが桁落ちです。">
+            <fieldset><legend>Q5. 1.235 − 1.234 のように、値のほぼ等しい2つの数を引いたとき、有効な数字の桁が大きく減る現象はどれですか？</legend><div class="quiz-options"><label><input type="radio" name="answer" value="cancellation" aria-describedby="feedback-q5"><span>桁落ち</span></label><label><input type="radio" name="answer" value="information" aria-describedby="feedback-q5"><span>情報落ち</span></label><label><input type="radio" name="answer" value="underflow" aria-describedby="feedback-q5"><span>アンダーフロー</span></label><label><input type="radio" name="answer" value="rounding" aria-describedby="feedback-q5"><span>丸め誤差</span></label></div></fieldset>
+            <button type="submit" class="button secondary" hidden>答え合わせ</button><p id="feedback-q5" data-feedback class="quiz-feedback" role="status" hidden></p>
+          </form>
+          <p class="quiz-summary" data-quiz-summary role="status">0 / 5問回答</p>
+          <button type="button" class="button secondary" data-quiz-reset hidden>もう一度挑戦する</button>
+        </section>
+        <section id="complete" class="lesson-section" aria-labelledby="complete-title">
+          <div class="completion-panel"><h2 id="complete-title">学習を振り返る</h2><p>「小数点の右の重みは半分ずつ」「浮動小数点数は、数字の並びと小数点の位置を分けて持つ」「0.1は2進数で割り切れず、どこかで止めると誤差が出る」。この3つを、自分の言葉で説明できそうでしょうか。</p><p class="small muted">理解できたら、学習完了を記録してください。全問正解でなくても記録でき、いつでも未完了に戻せます。</p><button type="button" class="button" data-complete hidden>この教材を学習完了にする</button><p class="completion-message" data-completion-message role="status"></p></div>
+          <nav class="lesson-nav" aria-label="教材の前後ナビゲーション"><a href="01-number-bit.html"><span>前提の教材</span>Lesson 01　進数・bit</a><a href="../index.html#chapter-11"><span>目次へ戻る</span>Extraの一覧</a></nav>
+        </section>
+      </article>
+    </div>
+  </main>
+  <footer class="site-footer"><div class="container"><p>支援士学習 · 科目A-1 技術基礎</p><p>進捗はこのブラウザに保存されます。端末間の同期はありません。</p></div></footer>
+</body>
+</html>

@@ -150,7 +150,7 @@
           <ul><li><strong>2進数 → 10進数：</strong>1の桁の重みを足す。</li><li><strong>10進数 → 2進数：</strong>大きい重みから順に、残りから引けるなら1、引けなければ0（「2. 仕組みを理解する」の手順）。</li><li><strong>2進数 ↔ 16進数：</strong>右から4bitずつ区切って読む。</li><li><strong>n bitの種類数：</strong>2ⁿ通り。符号なし整数の最大値は2ⁿ − 1。</li></ul>
           <div class="example"><h3>45を8bitで表す</h3><p class="formula">45 = 32 + 8 + 4 + 1</p><p>重み128と64は使わず0。32は使うので1。このように並べると、<code>00101101</code>になります。</p><p><code>0010</code>は2、<code>1101</code>は13（D）なので、16進数では<code>2D</code>です。</p></div>
           <p class="notice"><strong>よくある混同：</strong>8bitは256通りですが、最大値は255です。「何通り」と「最大でいくつ」を読み分けてください。</p>
-          <p class="small muted">この仕組みは、後のIPアドレスやサブネットの理解につながります。実際の試験では、この先の内容として、負の数の表し方（2の補数）、小数の2進数、シフト演算なども問われます。どれも、このページの「重み」の考え方が土台になります。</p>
+          <p class="small muted">この仕組みは、後のIPアドレスやサブネットの理解につながります。実際の試験では、この先の内容として、負の数の表し方（2の補数）、小数の2進数、シフト演算なども問われます。どれも、このページの「重み」の考え方が土台になります。小数の2進数は、発展教材の<a href="e01-floating-point.html">Extra 01　浮動小数点数</a>で扱います。</p>
         </section>
         <section id="quiz" class="lesson-section" aria-labelledby="quiz-title" data-quiz data-quiz-version="2">
           <h2 id="quiz-title"><span class="section-number">5.</span>確認問題</h2>

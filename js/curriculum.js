@@ -11,9 +11,11 @@
     ["システム", ["性能", "信頼性"]],
     ["暗号", ["ハッシュ・MAC", "共通鍵暗号", "公開鍵暗号", "電子署名・PKI・TLS"]],
     ["Web・セキュリティ", ["HTTP・Cookie・Session", "Web攻撃"]],
-    ["総合", ["A-1総合演習"]]
+    ["総合", ["A-1総合演習"]],
+    // Extraは本編より難しい発展内容。IDは並び順で決まるため、教材は常に末尾へ追加する。
+    ["Extra", ["浮動小数点数"]]
   ];
-  const paths = { "01": "lessons/01-number-bit.html", "02": "lessons/02-logic.html", "03": "lessons/03-flipflop.html", "04": "lessons/04-cpu.html", "05": "lessons/05-memory-cache.html", "06": "lessons/06-io-interrupt.html" };
+  const paths = { "01": "lessons/01-number-bit.html", "02": "lessons/02-logic.html", "03": "lessons/03-flipflop.html", "04": "lessons/04-cpu.html", "05": "lessons/05-memory-cache.html", "06": "lessons/06-io-interrupt.html", "30": "lessons/e01-floating-point.html" };
   let number = 0;
   const lessons = chapters.flatMap(([chapterTitle, titles], index) => titles.map(title => {
     const id = String(++number).padStart(2, "0");
