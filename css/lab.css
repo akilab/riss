@@ -23,8 +23,6 @@
 .converter input, .converter select { width: 100%; }
 .input-error { min-height: 28px; margin-top: 8px; margin-bottom: 8px; font-size: 14px; }
 .lab-reason { min-height: 3.6em; }
-.lab-tasks { margin-block: 24px 0; border-top: 1px solid var(--color-border); padding-top: 20px; }
-.lab-tasks h4 { margin: 0 0 8px; }
 @media (max-width: 620px) {
   .lab { padding: 20px; }
   .converter { grid-template-columns: 1fr; }
