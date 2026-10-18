@@ -1,0 +1,13 @@
+/* Lesson 03 Lab 2：教科書と同じ、NORゲート2個を交差させたフリップフロップ。 */
+.circuit-svg.memory-svg .memory-gate { font-size: 13px; fill: var(--color-muted); }
+/* Lab 3：フリップフロップを4個並べたレジスタ。 */
+.circuit-svg.register-svg .register-weight { font-size: 13px; fill: var(--color-muted); }
+.circuit-svg.register-svg .register-label { font-size: 14px; fill: var(--color-muted); }
+[data-register-lab] .lab-controls { margin-top: 0; }
+@media (max-width: 520px) {
+  .circuit-svg.memory-svg .svg-value { font-size: 24px; }
+  .circuit-svg.memory-svg .memory-gate { font-size: 14px; }
+  .circuit-svg.register-svg text { font-size: 22px; }
+  .circuit-svg.register-svg .svg-value { font-size: 26px; }
+  .circuit-svg.register-svg .register-weight, .circuit-svg.register-svg .register-label { font-size: 16px; }
+}

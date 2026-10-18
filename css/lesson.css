@@ -16,6 +16,8 @@
 .objectives ul { margin-bottom: 0; }
 .example { padding: 24px; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius); margin-block: 24px; }
 .example p:last-child { margin-bottom: 0; }
+.column { border-left: 4px solid var(--color-primary); }
+.column h3 { margin-top: 0; }
 .place-values { display: flex; flex-wrap: wrap; gap: 12px; margin-block: 16px; }
 .place-value { flex: 1; min-width: 70px; padding: 12px; background: var(--color-tint); text-align: center; border-radius: 6px; }
 .place-value strong { display: block; font: 700 28px/1.5 var(--font-number); }
@@ -70,5 +72,9 @@
   .lesson-nav { grid-template-columns: 1fr; }
   .reference-table th, .reference-table td { padding: 8px; }
   .term-list > div { grid-template-columns: 1fr; gap: 2px; }
+  .stack-table thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  .stack-table tr { display: block; border: 1px solid var(--color-border); border-radius: 6px; margin-bottom: 8px; }
+  .stack-table th, .stack-table td { display: block; border: 0; }
+  .stack-table td::before { content: attr(data-label); display: block; font-size: 13px; font-weight: 700; color: var(--color-muted); }
   .nibble-example { gap: 12px; }
 }
