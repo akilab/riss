@@ -20,6 +20,8 @@
 .place-value { flex: 1; min-width: 70px; padding: 12px; background: var(--color-tint); text-align: center; border-radius: 6px; }
 .place-value strong { display: block; font: 700 28px/1.5 var(--font-number); }
 .formula { font-family: var(--font-number); font-size: 19px; overflow-wrap: anywhere; }
+.table-scroll { overflow-x: auto; margin-block: 20px; }
+.table-scroll .reference-table { margin-block: 0; }
 .reference-table { width: 100%; border-collapse: collapse; background: var(--color-surface); margin-block: 20px; font-size: 15px; }
 .reference-table caption { text-align: left; font-weight: 700; margin-bottom: 8px; }
 .reference-table th, .reference-table td { border: 1px solid var(--color-border); padding: 10px 12px; text-align: left; }
@@ -44,6 +46,11 @@
 .quiz-summary { min-height: 32px; font-weight: 700; }
 .completion-panel { padding: 28px; border: 1px solid var(--color-border); background: var(--color-surface); border-radius: var(--radius); }
 .completion-panel h2 { font-size: 22px; }
+.completion-panel h3 { font-size: 18px; margin: 20px 0 8px; }
+.term-list { display: grid; gap: 8px; margin: 0; }
+.term-list > div { display: grid; grid-template-columns: 10em minmax(0, 1fr); gap: 12px; padding: 8px 12px; background: var(--color-tint); border-radius: 6px; }
+.term-list dt { font-weight: 700; }
+.term-list dd { margin: 0; }
 .completion-message { min-height: 32px; margin: 12px 0 0; color: var(--color-success); }
 .lesson-nav { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 24px; }
 .lesson-nav > * { padding: 16px 20px; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 8px; }
@@ -60,5 +67,6 @@
   .objectives, .example, .quiz-question, .completion-panel { padding: 20px; }
   .lesson-nav { grid-template-columns: 1fr; }
   .reference-table th, .reference-table td { padding: 8px; }
+  .term-list > div { grid-template-columns: 1fr; gap: 2px; }
   .nibble-example { gap: 12px; }
 }

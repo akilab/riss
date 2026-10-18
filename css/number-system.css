@@ -12,7 +12,4 @@ body[data-lesson-id="01"] #lab { padding-top: 12px; }
 [data-number-lab] .lab-reason { min-height: 3.2em; margin-block: 8px; }
 [data-number-lab] form .small { margin: 6px 0 0; }
 [data-number-lab] .input-error { min-height: 24px; margin-block: 2px 4px; }
-.table-scroll { overflow-x: auto; margin-block: 20px; }
-.table-scroll .reference-table { margin-block: 0; }
-.bit-scale-table td:nth-child(-n+3) { white-space: nowrap; }
-.bit-scale-table td:last-child { min-width: 14em; }
+.bit-count-table td:first-child { white-space: nowrap; }
