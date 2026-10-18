@@ -20,6 +20,8 @@
 .place-value { flex: 1; min-width: 70px; padding: 12px; background: var(--color-tint); text-align: center; border-radius: 6px; }
 .place-value strong { display: block; font: 700 28px/1.5 var(--font-number); }
 .formula { font-family: var(--font-number); font-size: 19px; overflow-wrap: anywhere; }
+.photo-figure { margin-inline: 0; }
+.hardware-photo { display: block; width: 100%; height: auto; border-radius: 8px; margin-bottom: 8px; }
 .table-scroll { overflow-x: auto; margin-block: 20px; }
 .table-scroll .reference-table { margin-block: 0; }
 .reference-table { width: 100%; border-collapse: collapse; background: var(--color-surface); margin-block: 20px; font-size: 15px; }

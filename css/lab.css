@@ -41,6 +41,36 @@
 .lab-controls { display: flex; align-items: end; flex-wrap: wrap; gap: 12px; margin-block: 20px; }
 .lab-controls label { display: block; font-size: 14px; font-weight: 700; margin-bottom: 6px; }
 .signal-toggle { min-width: 110px; }
+.gate-picker { margin-block: 20px 0; }
+.gate-picker > span { display: block; font-size: 14px; font-weight: 700; margin-bottom: 6px; }
+.gate-buttons { display: flex; gap: 6px; }
+.gate-buttons .signal-toggle { flex: 1 1 0; min-width: 0; padding-inline: 4px; white-space: nowrap; }
+@media (max-width: 460px) {
+  .gate-buttons .signal-toggle { font-size: 14px; }
+}
+/* 論理演算Lab（Lab 1・Lab 2）は、PCでは操作と図を左、結果と真理値表を右に置いて1画面に収める。 */
+:is([data-logic-lab], [data-nand-lab]) { padding: 16px; margin-block: 12px; }
+:is([data-logic-lab], [data-nand-lab]) h3 { font-size: 20px; margin-bottom: 8px; }
+:is([data-logic-lab], [data-nand-lab]) .prediction { padding: 8px 12px; margin-block: 8px 12px; }
+.logic-layout { display: grid; gap: 16px; }
+:is([data-logic-lab], [data-nand-lab]) .gate-picker { margin-top: 0; }
+:is([data-logic-lab], [data-nand-lab]) .lab-controls { margin-block: 8px; }
+:is([data-logic-lab], [data-nand-lab]) .circuit-svg { margin-block: 8px; }
+:is([data-logic-lab], [data-nand-lab]) .signal-legend { margin: 0; }
+:is([data-logic-lab], [data-nand-lab]) .lab-result { padding: 12px 16px; margin-block: 0 12px; }
+:is([data-logic-lab], [data-nand-lab]) .lab-result p { margin: 0; }
+:is([data-logic-lab], [data-nand-lab]) .truth-table { margin-block: 0 12px; font-size: 14px; }
+:is([data-logic-lab], [data-nand-lab]) .truth-table th, :is([data-logic-lab], [data-nand-lab]) .truth-table td { padding: 6px 8px; }
+.circuit-svg.nand-svg text.nand-name { font-size: 12px; }
+.circuit-svg.nand-svg text.nand-mid { font-size: 16px; fill: var(--color-muted); }
+@media (max-width: 520px) {
+  .circuit-svg.nand-svg text.svg-value { font-size: 24px; }
+  .circuit-svg.nand-svg text.nand-name { font-size: 15px; }
+  .circuit-svg.nand-svg text.nand-mid { font-size: 18px; }
+}
+@media (min-width: 760px) {
+  .logic-layout { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); align-items: start; }
+}
 .signal-toggle[aria-pressed="true"] { background: var(--color-primary); color: var(--color-on-primary); }
 .signal-toggle[aria-pressed="true"]:hover { background: var(--color-primary-hover); }
 .circuit-svg { display: block; width: 100%; height: auto; background: var(--color-bg); border: 1px solid var(--color-border); border-radius: 8px; margin-block: 20px; }

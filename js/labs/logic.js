@@ -4,7 +4,8 @@
   if (!lab) return;
   let a = 0;
   let b = 0;
-  const select = lab.querySelector("select");
+  let name = "AND";
+  const gateButtons = [...lab.querySelectorAll("[data-gate]")];
   const gates = {
     AND: { calculate: (a, b) => a & b, rule: "両方が1のときだけ1になります。", shape: "M205 60 H260 C355 60 355 190 260 190 H205 Z" },
     OR: { calculate: (a, b) => a | b, rule: "少なくとも一方が1なら1になります。両方が1でも1です。", shape: "M200 60 Q280 55 345 125 Q280 195 200 190 Q240 125 200 60 Z" },
@@ -17,8 +18,8 @@
   const tbody = lab.querySelector("tbody");
 
   function render(announce = false) {
-    const name = select.value;
     const gate = gates[name];
+    gateButtons.forEach(button => button.setAttribute("aria-pressed", String(button.dataset.gate === name)));
     const single = name === "NOT";
     const y = gate.calculate(a, b);
     inputA.textContent = `入力A：${a}`;
@@ -62,8 +63,8 @@
   }
   inputA.addEventListener("click", () => { a = 1 - a; render(true); });
   inputB.addEventListener("click", () => { b = 1 - b; render(true); });
-  select.addEventListener("change", () => { render(true); });
-  lab.querySelector("[data-logic-reset]").addEventListener("click", () => { a = b = 0; select.value = "AND"; render(true); });
+  gateButtons.forEach(button => button.addEventListener("click", () => { name = button.dataset.gate; render(true); }));
+  lab.querySelector("[data-logic-reset]").addEventListener("click", () => { a = b = 0; name = "AND"; render(true); });
   render();
   lab.hidden = false;
 })();
