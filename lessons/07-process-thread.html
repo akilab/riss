@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="プロセスとスレッドを、大きな図と身近な話題で見る講義用の教材。">
+  <title>Lesson 07 プロセス・スレッド | 科目A-1 技術基礎</title>
+  <script src="../js/theme.js"></script>
+  <link rel="stylesheet" href="../css/common.css">
+  <link rel="stylesheet" href="../css/lesson.css">
+  <link rel="stylesheet" href="../css/lecture.css">
+  <script src="../js/curriculum.js" defer></script>
+  <script src="../js/progress.js" defer></script>
+  <script src="../js/common.js" defer></script>
+</head>
+<body data-lesson-id="07">
+  <a class="skip-link" href="#main">本文へ移動</a>
+  <header class="site-header"><div class="container header-inner"><a class="brand" href="../index.html">支援士学習<span>情報処理安全確保支援士 · 科目A-1</span></a><div class="header-actions"><a class="header-link" href="../index.html#curriculum">教材一覧</a><button type="button" class="button secondary theme-toggle" data-theme-toggle aria-label="ダークモード" aria-pressed="false" hidden>ダークモード：オフ</button></div></div></header>
+  <main id="main" class="container" tabindex="-1">
+    <p class="notice storage-notice" data-storage-notice role="status" hidden></p>
+    <p class="notice theme-notice" data-theme-notice role="status" hidden></p>
+    <nav class="breadcrumb" aria-label="パンくず"><a href="../index.html">全体目次</a> / <a href="../index.html#chapter-03">OS</a> / <span aria-current="page">プロセス・スレッド</span></nav>
+    <header class="lesson-heading">
+      <span class="status" data-lesson-status="07">未学習</span>
+      <h1>Lesson 07　プロセス・スレッド</h1>
+      <p>CPUは1つなのに、どうしてたくさんのアプリが同時に動くのでしょう？</p>
+      <div class="lesson-meta"><span>前提知識：Lesson 04</span><span>範囲：プロセス・状態遷移・スレッド</span></div>
+    </header>
+    <div class="lesson-layout">
+      <nav class="lesson-toc" aria-label="ページ内目次">
+        <h2>場面</h2>
+        <ol><li><a href="#s1">今、何個動いている？</a></li><li><a href="#s2">プロセスとは</a></li><li><a href="#s3">同時に見える理由</a></li><li><a href="#s4">3つの状態</a></li><li><a href="#s5">スレッドとは</a></li><li><a href="#roles">役割の違い</a></li><li><a href="#s6">コラム：ブラウザ</a></li><li><a href="#s7">自分のPCでのぞく</a></li><li><a href="#exam">試験では</a></li><li><a href="#complete">用語</a></li></ol>
+      </nav>
+      <article class="lesson-body" aria-label="プロセス・スレッドの教材">
+        <section id="s1" class="scene" aria-labelledby="s1-title">
+          <h2 id="s1-title">あなたのPCでは今、何個のプログラムが動いている？</h2>
+          <div class="scene-numbers"><div><span class="big-number">数百</span><span>プロセス</span></div><div><span class="big-number">数千</span><span>スレッド</span></div></div>
+          <p class="scene-lead">何もしていないつもりでも、裏でこれだけ動いています。</p>
+          <p class="scene-try"><strong>やってみよう：</strong>Windowsは <kbd>Ctrl</kbd>＋<kbd>Shift</kbd>＋<kbd>Esc</kbd> で「タスクマネージャー」、Macは「アクティビティモニタ」を開いてみましょう。のぞき方は<a href="#s7">最後の場面</a>にまとめています。</p>
+        </section>
+
+        <section id="s2" class="scene" aria-labelledby="s2-title">
+          <h2 id="s2-title">プロセス ＝ 実行中のプログラム</h2>
+          <figure class="scene-figure">
+            <svg class="scene-svg" viewBox="0 0 760 300" role="img" aria-labelledby="s2-svg-title"><title id="s2-svg-title">SSDの中のプログラムを起動すると、主記憶の中にプロセスができる。プロセスは自分専用の命令・データ・実行位置を持つ。</title>
+              <rect class="scene-box" x="20" y="80" width="200" height="140" rx="10"/>
+              <text x="120" y="120" text-anchor="middle" class="scene-label">プログラム</text>
+              <text x="120" y="165" text-anchor="middle" class="scene-sub">SSDの中のファイル</text>
+              <path class="scene-arrow" d="M230 150H330" marker-end="url(#s2-head)"/>
+              <text x="280" y="135" text-anchor="middle" class="scene-sub">起動</text>
+              <rect class="scene-frame" x="340" y="20" width="400" height="260" rx="10"/>
+              <text x="360" y="50" class="scene-sub">主記憶</text>
+              <rect class="scene-box is-accent" x="370" y="70" width="340" height="190" rx="10"/>
+              <text x="540" y="108" text-anchor="middle" class="scene-label">プロセス</text>
+              <text x="540" y="140" text-anchor="middle" class="scene-sub">専用のメモリ領域</text>
+              <rect class="scene-chip" x="395" y="165" width="90" height="60" rx="6"/><text x="440" y="201" text-anchor="middle" class="scene-sub">命令</text>
+              <rect class="scene-chip" x="495" y="165" width="90" height="60" rx="6"/><text x="540" y="201" text-anchor="middle" class="scene-sub">データ</text>
+              <rect class="scene-chip" x="595" y="165" width="90" height="60" rx="6"/><text x="640" y="192" text-anchor="middle" class="scene-sub">今どこ</text><text x="640" y="214" text-anchor="middle" class="scene-note">（PCなど）</text>
+              <defs><marker id="s2-head" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path class="scene-head" d="M0 0L10 5L0 10Z"/></marker></defs>
+            </svg>
+          </figure>
+          <p class="scene-lead">同じプログラムでも、起動するたびに別のプロセスになります。メモ帳を2つ開けば、プロセスも2つです。</p>
+        </section>
+
+        <section id="s3" class="scene" aria-labelledby="s3-title">
+          <h2 id="s3-title">CPUは1つでも、同時に動いて見える理由</h2>
+          <figure class="scene-figure">
+            <svg class="scene-svg" viewBox="0 0 760 210" role="img" aria-labelledby="s3-svg-title"><title id="s3-svg-title">1つのCPUが、ブラウザ、音楽、Wordを少しずつ順番に実行している時間の流れ。</title>
+              <text x="20" y="40" class="scene-sub">CPU</text>
+              <g class="slice-row">
+                <rect class="slice is-a" x="80" y="60" width="72" height="64" rx="6"/><text x="116" y="99" text-anchor="middle" class="slice-text">ブラウザ</text>
+                <rect class="slice is-b" x="156" y="60" width="72" height="64" rx="6"/><text x="192" y="99" text-anchor="middle" class="slice-text">音楽</text>
+                <rect class="slice is-c" x="232" y="60" width="72" height="64" rx="6"/><text x="268" y="99" text-anchor="middle" class="slice-text">Word</text>
+                <rect class="slice is-a" x="308" y="60" width="72" height="64" rx="6"/><text x="344" y="99" text-anchor="middle" class="slice-text">ブラウザ</text>
+                <rect class="slice is-b" x="384" y="60" width="72" height="64" rx="6"/><text x="420" y="99" text-anchor="middle" class="slice-text">音楽</text>
+                <rect class="slice is-c" x="460" y="60" width="72" height="64" rx="6"/><text x="496" y="99" text-anchor="middle" class="slice-text">Word</text>
+                <rect class="slice is-a" x="536" y="60" width="72" height="64" rx="6"/><text x="572" y="99" text-anchor="middle" class="slice-text">ブラウザ</text>
+                <rect class="slice is-b" x="612" y="60" width="72" height="64" rx="6"/><text x="648" y="99" text-anchor="middle" class="slice-text">音楽</text>
+              </g>
+              <path class="scene-arrow" d="M80 150H730" marker-end="url(#s3-head)"/><text x="730" y="176" text-anchor="end" class="scene-sub">時間</text>
+              <path class="scene-brace" d="M80 135V142H152V135"/><text x="116" y="196" text-anchor="middle" class="scene-note">数ミリ秒</text>
+              <defs><marker id="s3-head" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path class="scene-head" d="M0 0L10 5L0 10Z"/></marker></defs>
+            </svg>
+          </figure>
+          <p class="scene-lead">数ミリ秒ずつ順番に切り替えています。<strong>1秒に何百回</strong>も切り替わるので、人には同時に見えます。パラパラ漫画と同じです。</p>
+        </section>
+
+        <section id="s4" class="scene" aria-labelledby="s4-title">
+          <h2 id="s4-title">プロセスの3つの状態</h2>
+          <figure class="scene-figure">
+            <svg class="scene-svg" viewBox="0 0 760 400" role="img" aria-labelledby="s4-svg-title"><title id="s4-svg-title">実行可能から、CPUの順番が来ると実行中へ。実行中から、持ち時間が切れると実行可能へ、入出力を待つときは待ちへ。待ちから、入出力が終わると実行可能へ。待ちから実行中へ直接は戻れない。</title>
+              <defs><marker id="s4-head" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path class="scene-head" d="M0 0L10 5L0 10Z"/></marker><marker id="s4-head-muted" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path class="scene-head-muted" d="M0 0L10 5L0 10Z"/></marker></defs>
+              <path class="scene-arrow" d="M250 150Q360 50 480 75" marker-end="url(#s4-head)"/>
+              <text x="355" y="70" text-anchor="middle" class="scene-sub">CPUの順番が来た</text>
+              <path class="scene-arrow" d="M480 110Q370 170 250 175" marker-end="url(#s4-head)"/>
+              <text x="380" y="190" text-anchor="middle" class="scene-sub">持ち時間が切れた</text>
+              <path class="scene-arrow" d="M590 120V265" marker-end="url(#s4-head)"/>
+              <text x="580" y="200" text-anchor="end" class="scene-sub">入出力を待つ</text>
+              <path class="scene-arrow" d="M480 320Q300 330 165 210" marker-end="url(#s4-head)"/>
+              <text x="250" y="318" text-anchor="middle" class="scene-sub">入出力が終わった</text>
+              <path class="scene-arrow is-forbidden" d="M680 265V125" marker-end="url(#s4-head-muted)"/>
+              <text x="700" y="205" class="scene-forbidden">×</text>
+              <rect class="scene-box" x="40" y="130" width="200" height="80" rx="40"/><text x="140" y="168" text-anchor="middle" class="scene-label">実行可能</text><text x="140" y="196" text-anchor="middle" class="scene-note">CPUの順番待ち</text>
+              <rect class="scene-box is-accent" x="490" y="40" width="210" height="80" rx="40"/><text x="595" y="78" text-anchor="middle" class="scene-label">実行中</text><text x="595" y="106" text-anchor="middle" class="scene-note">CPUを使っている</text>
+              <rect class="scene-box" x="490" y="270" width="210" height="80" rx="40"/><text x="595" y="308" text-anchor="middle" class="scene-label">待ち</text><text x="595" y="336" text-anchor="middle" class="scene-note">入出力の完了を待っている</text>
+            </svg>
+          </figure>
+          <p class="scene-lead">入出力が終わっても、すぐには実行中に戻れません。<strong>いったん実行可能に戻り、順番を待ち直します。</strong>レジで財布を探していた客が、見つけたら列の最後に並び直すのと同じです。</p>
+        </section>
+
+        <section id="s5" class="scene" aria-labelledby="s5-title">
+          <h2 id="s5-title">スレッド ＝ 1つのプロセスの中で、同時に進む作業</h2>
+          <figure class="scene-figure">
+            <svg class="scene-svg" viewBox="0 0 760 290" role="img" aria-labelledby="s5-svg-title"><title id="s5-svg-title">左：プロセスを2つ作ると、メモリも別々で、それぞれにメインスレッドが1つある。右：1つのプロセスに、メインスレッドと追加のスレッドがあると、同じメモリを共有して同時に作業する。</title>
+              <text x="185" y="30" text-anchor="middle" class="scene-label">プロセスを2つ</text>
+              <rect class="scene-box" x="20" y="50" width="160" height="200" rx="10"/><rect class="scene-box" x="190" y="50" width="160" height="200" rx="10"/>
+              <rect class="scene-chip" x="40" y="70" width="120" height="44" rx="6"/><text x="100" y="98" text-anchor="middle" class="scene-sub">メモリ</text>
+              <rect class="scene-chip" x="210" y="70" width="120" height="44" rx="6"/><text x="270" y="98" text-anchor="middle" class="scene-sub">メモリ</text>
+              <g class="worker"><circle cx="100" cy="150" r="16"/><path d="M76 210Q100 165 124 210Z"/></g><text x="100" y="236" text-anchor="middle" class="scene-note">メインスレッド</text>
+              <g class="worker"><circle cx="270" cy="150" r="16"/><path d="M246 210Q270 165 294 210Z"/></g><text x="270" y="236" text-anchor="middle" class="scene-note">メインスレッド</text>
+              <text x="185" y="275" text-anchor="middle" class="scene-note">メモリが別々（安全だが重い）</text>
+              <text x="575" y="30" text-anchor="middle" class="scene-label">1つのプロセスにスレッド2つ</text>
+              <rect class="scene-box is-accent" x="410" y="50" width="330" height="200" rx="10"/>
+              <rect class="scene-chip" x="455" y="70" width="240" height="44" rx="6"/><text x="575" y="98" text-anchor="middle" class="scene-sub">メモリ（共有）</text>
+              <g class="worker"><circle cx="510" cy="150" r="16"/><path d="M486 210Q510 165 534 210Z"/></g><text x="510" y="236" text-anchor="middle" class="scene-note">メインスレッド</text>
+              <g class="worker"><circle cx="640" cy="150" r="16"/><path d="M616 210Q640 165 664 210Z"/></g><text x="640" y="236" text-anchor="middle" class="scene-note">追加のスレッド</text>
+              <text x="575" y="275" text-anchor="middle" class="scene-note">メモリを共有（軽いが、ぶつかることも）</text>
+            </svg>
+          </figure>
+          <p class="scene-lead">動画アプリは、「再生」と「次の場面の読み込み」を別々のスレッドで同時に進めています。</p>
+        </section>
+
+        <section id="roles" class="scene" aria-labelledby="roles-title">
+          <h2 id="roles-title">プロセスは「持ち物を管理する入れ物」、スレッドは「CPUで動く流れ」</h2>
+          <figure class="scene-figure">
+            <svg class="scene-svg" viewBox="0 0 760 290" role="img" aria-labelledby="roles-svg-title"><title id="roles-svg-title">プロセス（ブラウザのタブ1つ）は、メモリ・開いたファイル・通信の窓口をOSから受け取って持つ。その中で、画面を描く、JavaScriptを動かす、データを受け取るの3つのスレッドが、それぞれCPUで実行される。</title>
+              <defs><marker id="roles-head" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path class="scene-head" d="M0 0L10 5L0 10Z"/></marker></defs>
+              <rect class="scene-box is-accent" x="20" y="16" width="590" height="258" rx="10"/>
+              <text x="40" y="48" class="scene-label">プロセス（例：ブラウザのタブ1つ）</text>
+              <rect class="scene-chip" x="40" y="64" width="130" height="40" rx="6"/><text x="105" y="90" text-anchor="middle" class="scene-sub">メモリ</text>
+              <rect class="scene-chip" x="180" y="64" width="150" height="40" rx="6"/><text x="255" y="90" text-anchor="middle" class="scene-sub">開いたファイル</text>
+              <rect class="scene-chip" x="340" y="64" width="130" height="40" rx="6"/><text x="405" y="90" text-anchor="middle" class="scene-sub">通信の窓口</text>
+              <text x="482" y="90" class="scene-note">← 持ち物</text>
+              <text x="44" y="140" class="scene-sub">スレッド1（メインスレッド）：画面を描く</text><path class="scene-arrow" d="M40 150H606" marker-end="url(#roles-head)"/><text x="44" y="190" class="scene-sub">スレッド2：JavaScriptを動かす</text><path class="scene-arrow" d="M40 200H606" marker-end="url(#roles-head)"/><text x="44" y="240" class="scene-sub">スレッド3：データを受け取る</text><path class="scene-arrow" d="M40 250H606" marker-end="url(#roles-head)"/>
+              <rect class="scene-box" x="630" y="120" width="110" height="150" rx="10"/><text x="685" y="190" text-anchor="middle" class="scene-label">CPU</text><text x="685" y="218" text-anchor="middle" class="scene-note">で実行</text>
+            </svg>
+          </figure>
+          <p class="scene-lead">OSは、メモリなどの持ち物を<strong>プロセスごと</strong>に渡し、CPUの順番を<strong>スレッドごと</strong>に回します。</p>
+          <p class="scene-try"><strong>誤解しやすい点：</strong>「プロセスか、スレッドか」の二択ではありません。<strong>どのプロセスにも、必ずスレッドが1つ以上あります。</strong>最初の1つを<strong>メインスレッド</strong>と呼び、画面のあるアプリでは画面の担当です。メインスレッドが重い処理で手一杯になると、画面が固まり「応答なし」になります。</p>
+        </section>
+
+        <section id="s6" class="scene" aria-labelledby="s6-title">
+          <aside class="example column" aria-labelledby="s6-title"><h2 id="s6-title" class="column-heading">コラム：ブラウザは、タブごとにプロセスを分けるようになった</h2>
+            <div class="table-scroll" tabindex="0" role="region" aria-label="ブラウザのプロセスの持ち方の移り変わりの表。狭い画面では横スクロールできます。"><table class="reference-table stack-table"><caption>使われた理由と、変わった理由</caption><thead><tr><th scope="col">方式</th><th scope="col">使われた理由</th><th scope="col">変わった理由</th></tr></thead><tbody>
+              <tr><th scope="row">全部のタブで1つのプロセス<br><span class="small muted">2000年代まで</span></th><td data-label="使われた理由">メモリが少なくて済む</td><td data-label="変わった理由">1つのタブが固まると、全部のタブが道連れになった</td></tr>
+              <tr><th scope="row">タブごとにプロセス<br><span class="small muted">Chrome（2008年〜）</span></th><td data-label="使われた理由">1つのタブが落ちても、ほかのタブは無事</td><td data-label="変わった理由">同じタブの中の別サイトから、情報をのぞける恐れが残った</td></tr>
+              <tr><th scope="row">サイトごとにプロセス<br><span class="small muted">2018年〜</span></th><td data-label="使われた理由">CPUの脆弱性Spectreが見つかり、サイト同士の壁を厚くした</td><td data-label="変わった理由">今も現役。メモリは多く使うが、安全を優先</td></tr>
+            </tbody></table></div>
+            <p class="scene-lead">プロセスは<strong>お互いのメモリをのぞけない</strong>。この壁が、セキュリティの守りになっています。</p>
+          </aside>
+        </section>
+
+        <section id="s7" class="scene" aria-labelledby="s7-title">
+          <h2 id="s7-title">自分のPCで、プロセスとスレッドをのぞいてみよう</h2>
+          <div class="os-grid">
+            <div class="os-card"><h3>Windows：タスクマネージャー</h3><ol>
+              <li><kbd>Ctrl</kbd>＋<kbd>Shift</kbd>＋<kbd>Esc</kbd> で開く。</li>
+              <li><strong>「パフォーマンス」→「CPU」</strong>：グラフの下に、PC全体の<strong>プロセス数とスレッド数</strong>が出ています。</li>
+              <li><strong>「詳細」</strong>：列の見出しを右クリック →「列の選択」→「<strong>スレッド</strong>」にチェック。プロセスごとのスレッド数が見えます。</li>
+              <li>「詳細」で、ブラウザの<code>msedge.exe</code>や<code>chrome.exe</code>が何個並んでいるか数えてみる。</li>
+            </ol></div>
+            <div class="os-card"><h3>Mac：アクティビティモニタ</h3><ol>
+              <li><kbd>⌘</kbd>＋<kbd>Space</kbd> で「アクティビティモニタ」と入力して開く。</li>
+              <li><strong>「CPU」タブ</strong>：下の欄に、Mac全体の<strong>スレッド数とプロセス数</strong>が出ています。</li>
+              <li>同じ表の<strong>「スレッド」列</strong>で、プロセスごとのスレッド数が見えます。列の見出しを押すと、多い順に並べ替えられます。</li>
+              <li>「表示」→「すべてのプロセス（階層表示）」で、プロセスが別のプロセスから生まれている親子関係が見えます。</li>
+            </ol></div>
+          </div>
+          <div class="scene-try"><strong>確かめよう：</strong><ul class="try-list"><li>PC全体で、プロセスとスレッドは何個ある？</li><li>スレッドがいちばん多いプロセスはどれ？</li><li>ブラウザでタブを1つ増やすと、ブラウザのプロセスは増える？（コラムの答え合わせ）</li></ul></div>
+          <p class="small muted">メニューの名前はWindows 11とmacOSのものです。版によって少し違うことがあります。「タスクの終了」や「終了」は、作業中のアプリが閉じるので押さないでください。</p>
+        </section>
+
+        <section id="exam" class="scene" aria-labelledby="exam-title">
+          <h2 id="exam-title">試験では</h2>
+          <ul class="scene-list"><li>状態遷移：「待ち → 実行中」に<strong>直接は行かない</strong>（必ず実行可能を通る）</li><li>プロセスは<strong>1つ以上のスレッド</strong>を持つ。スレッドはプロセスの中で<strong>メモリを共有</strong>する。プロセス同士は共有しない</li><li>プロセスは<strong>資源（メモリなど）を割り当てる単位</strong>、スレッドは<strong>CPUを割り当てる（実行する）単位</strong></li></ul>
+        </section>
+
+        <section id="complete" class="scene" aria-labelledby="complete-title"><div class="completion-panel"><h2 id="complete-title">覚えておく用語</h2><dl class="term-list"><div><dt>プロセス</dt><dd>実行中のプログラム。メモリなどの資源を受け取る単位</dd></div><div><dt>スレッド</dt><dd>プロセスの中でCPUを使って動く流れ。メモリを共有</dd></div><div><dt>メインスレッド</dt><dd>プロセスを作ると最初にできるスレッド</dd></div><div><dt>実行可能・実行中・待ち</dt><dd>プロセスの3つの状態</dd></div><div><dt>マルチタスク</dt><dd>短い時間で切り替えて、同時に動いて見せること</dd></div></dl><button type="button" class="button" data-complete hidden>この教材を学習完了にする</button><p class="completion-message" data-completion-message role="status"></p></div><nav class="lesson-nav" aria-label="教材の前後ナビゲーション"><a href="06-io-interrupt.html"><span>前の教材</span>Lesson 06　入出力・割込み</a><div><span>次の教材 · 準備中</span>Lesson 08　スケジューリング</div></nav><p class="small"><a href="../index.html#curriculum">全体の教材一覧へ戻る</a></p></section>
+      </article>
+    </div>
+  </main>
+  <footer class="site-footer"><div class="container"><p>支援士学習 · 科目A-1 技術基礎</p><p>進捗はこのブラウザに保存されます。端末間の同期はありません。</p></div></footer>
+</body>
+</html>

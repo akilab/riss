@@ -1,0 +1,55 @@
+/* 講義で映す「場面」型の教材。大きな図と短い文で、プロジェクタでも読める大きさにする。狭い画面では図を縮めすぎず、横スクロールにする。 */
+.scene { padding: 40px 0; border-top: 1px solid var(--color-border); scroll-margin-top: 24px; }
+.scene:first-child { border-top: 0; padding-top: 8px; }
+.scene h2 { font-size: 28px; line-height: 1.4; margin-bottom: 16px; }
+.scene-lead { font-size: 20px; line-height: 1.7; margin-block: 12px 0; }
+.scene-try { padding: 12px 16px; margin-top: 16px; background: var(--color-tint); border-radius: 8px; }
+.scene-try kbd { padding: 2px 6px; border: 1px solid var(--color-input-border); border-radius: 4px; font: 14px var(--font-number); background: var(--color-surface); }
+.scene-numbers { display: flex; flex-wrap: wrap; gap: 16px 48px; margin-block: 8px; }
+.scene-numbers > div { display: flex; align-items: baseline; gap: 8px; font-size: 22px; font-weight: 700; }
+.big-number { font: 700 64px/1.1 var(--font-body); color: var(--color-primary); }
+.scene-figure { margin: 0; overflow-x: auto; }
+.scene-svg { display: block; width: 100%; min-width: 560px; height: auto; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 10px; }
+.scene-svg text { fill: var(--color-text); font: 18px var(--font-body); }
+.scene-svg .scene-label { font-size: 24px; font-weight: 700; }
+.scene-svg .scene-sub { font-size: 18px; }
+.scene-svg .scene-note { font-size: 15px; fill: var(--color-muted); }
+.scene-svg .scene-forbidden { font-size: 34px; font-weight: 700; fill: var(--color-error); }
+.scene-box { fill: var(--color-bg); stroke: var(--color-input-border); stroke-width: 2; }
+.scene-box.is-accent { fill: var(--color-tint); stroke: var(--color-primary); stroke-width: 3; }
+.scene-frame { fill: none; stroke: var(--color-border); stroke-width: 2; stroke-dasharray: 6 6; }
+.scene-chip { fill: var(--color-surface); stroke: var(--color-border); stroke-width: 1.5; }
+.scene-arrow { fill: none; stroke: var(--color-primary); stroke-width: 3; }
+.scene-arrow.is-forbidden { stroke: var(--color-muted); stroke-dasharray: 8 6; }
+.scene-head { fill: var(--color-primary); }
+.scene-head-muted { fill: var(--color-muted); }
+.scene-brace { fill: none; stroke: var(--color-muted); stroke-width: 2; }
+.slice { stroke: var(--color-surface); stroke-width: 2; }
+.slice.is-a { fill: var(--color-primary); }
+.slice.is-b { fill: var(--color-success); }
+.slice.is-c { fill: var(--color-focus); }
+.scene-svg .slice-text { font-size: 15px; font-weight: 700; fill: var(--color-on-primary); }
+.worker circle, .worker path { fill: var(--color-primary); }
+.os-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.os-card { padding: 16px 20px; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 10px; }
+.os-card h3 { margin: 0 0 8px; font-size: 20px; }
+.os-card ol { margin: 0; padding-left: 1.4em; font-size: 17px; line-height: 1.7; }
+.os-card li { margin-block: 6px; }
+.os-card kbd { padding: 2px 6px; border: 1px solid var(--color-input-border); border-radius: 4px; font: 14px var(--font-number); background: var(--color-bg); }
+.try-list { margin: 4px 0 0; font-size: 17px; }
+.column-heading { font-size: 24px; }
+.scene-list { font-size: 20px; line-height: 1.7; }
+.scene-list li { margin-block: 8px; }
+@media (max-width: 760px) {
+  .os-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 520px) {
+  .scene { padding: 28px 0; }
+  .scene h2 { font-size: 22px; }
+  .scene-lead, .scene-list { font-size: 17px; }
+  .big-number { font-size: 48px; }
+}
+@media (forced-colors: active) {
+  .scene-arrow, .scene-box.is-accent { stroke: Highlight; }
+  .scene-head { fill: Highlight; }
+}
